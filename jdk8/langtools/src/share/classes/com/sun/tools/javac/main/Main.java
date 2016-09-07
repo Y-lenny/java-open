@@ -696,4 +696,9 @@ public class Main {
         "com.sun.tools.javac.resources.javac";
 //
 //    private static JavacMessages messages;
+
+    public static void main(String[] args) {
+        Main compiler = new Main("javac");
+        compiler.compile(args);
+    }
 }
