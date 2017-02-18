@@ -386,6 +386,7 @@ public abstract class AbstractQueuedSynchronizer
         /** waitStatus value to indicate thread has cancelled */
         static final int CANCELLED =  1;
         /** waitStatus value to indicate successor's thread needs unparking */
+        /** 表示当前线程可以被unparking掉 */
         static final int SIGNAL    = -1;
         /** waitStatus value to indicate thread is waiting on condition */
         static final int CONDITION = -2;
@@ -598,22 +599,23 @@ public abstract class AbstractQueuedSynchronizer
 
     /**
      * Creates and enqueues node for current thread and given mode.
+     * 针对当前线程和给定的队列模型进行创建和入队操作
      *
-     * @param mode Node.EXCLUSIVE for exclusive, Node.SHARED for shared
+     * @param mode Node.EXCLUSIVE for exclusive, Node.SHARED for shared //队列模型有两种：1. 特定；2.共享
      * @return the new node
      */
     private Node addWaiter(Node mode) {
-        Node node = new Node(Thread.currentThread(), mode);
+        Node node = new Node(Thread.currentThread(), mode); //针对当前线程创建节点
         // Try the fast path of enq; backup to full enq on failure
         Node pred = tail;
         if (pred != null) {
-            node.prev = pred;
-            if (compareAndSetTail(pred, node)) {
-                pred.next = node;
+            node.prev = pred; //新节点指定前一节点
+            if (compareAndSetTail(pred, node)) {// cas方式存入队列当中
+                pred.next = node;//老节点指定新节点；说明是双向队列
                 return node;
             }
         }
-        enq(node);
+        enq(node);//队列是lazy模式，所以在此新创建再入队
         return node;
     }
 
@@ -632,7 +634,7 @@ public abstract class AbstractQueuedSynchronizer
 
     /**
      * Wakes up node's successor, if one exists.
-     *
+     * 假如存在后继就唤醒他
      * @param node the node
      */
     private void unparkSuccessor(Node node) {
@@ -643,23 +645,24 @@ public abstract class AbstractQueuedSynchronizer
          */
         int ws = node.waitStatus;
         if (ws < 0)
-            compareAndSetWaitStatus(node, ws, 0);
+            compareAndSetWaitStatus(node, ws, 0);//cas设置节点状态为0
 
         /*
          * Thread to unpark is held in successor, which is normally
          * just the next node.  But if cancelled or apparently null,
          * traverse backwards from tail to find the actual
          * non-cancelled successor.
+         *
          */
         Node s = node.next;
-        if (s == null || s.waitStatus > 0) {
+        if (s == null || s.waitStatus > 0) {//所需要唤醒的节点状态< 0才是有效的
             s = null;
             for (Node t = tail; t != null && t != node; t = t.prev)
                 if (t.waitStatus <= 0)
                     s = t;
         }
         if (s != null)
-            LockSupport.unpark(s.thread);
+            LockSupport.unpark(s.thread);//唤醒后继有效节点
     }
 
     /**
@@ -798,22 +801,25 @@ public abstract class AbstractQueuedSynchronizer
             /*
              * This node has already set status asking a release
              * to signal it, so it can safely park.
+             * 假如当前节点的前继节点为SIGNAL状态表示当前线程可以被unpark
              */
             return true;
         if (ws > 0) {
             /*
              * Predecessor was cancelled. Skip over predecessors and
              * indicate retry.
+             * 前继节点为取消状态，跳过当前节点的前继节点，把当前节点的前继节点 的前继节点与当前节点绑定前继关系
              */
             do {
                 node.prev = pred = pred.prev;
             } while (pred.waitStatus > 0);
-            pred.next = node;
+            pred.next = node; //回溯到一个需要被唤醒的新的前继节点
         } else {
             /*
              * waitStatus must be 0 or PROPAGATE.  Indicate that we
              * need a signal, but don't park yet.  Caller will need to
              * retry to make sure it cannot acquire before parking.
+             * 如果前继节点为0或者共享锁状态，则设置前继节点为SIGNAL状态
              */
             compareAndSetWaitStatus(pred, ws, Node.SIGNAL);
         }
@@ -833,8 +839,8 @@ public abstract class AbstractQueuedSynchronizer
      * @return {@code true} if interrupted
      */
     private final boolean parkAndCheckInterrupt() {
-        LockSupport.park(this);
-        return Thread.interrupted();
+        LockSupport.park(this); //阻塞当前线程
+        return Thread.interrupted(); // 返回阻塞状态
     }
 
     /*
@@ -850,6 +856,7 @@ public abstract class AbstractQueuedSynchronizer
      * Acquires in exclusive uninterruptible mode for thread already in
      * queue. Used by condition wait methods as well as acquire.
      *
+     *
      * @param node the node
      * @param arg the acquire argument
      * @return {@code true} if interrupted while waiting
@@ -857,17 +864,30 @@ public abstract class AbstractQueuedSynchronizer
     final boolean acquireQueued(final Node node, int arg) {
         boolean failed = true;
         try {
+            /**
+             * 为什么会定义interrupted局部变量？
+             * 是因为线程被唤醒的方式有两种：
+             * 1、unpack()方法被调用：表示前锁已经被释放且是当前线程的前继线程触发的
+             * 2、线程中断：当线程被中断以后线程也会被唤醒，但是为了公平锁的绝对公平线程的唤醒必须是第一种情况；所以下面进行线程中断检查方法
+             */
             boolean interrupted = false;
-            for (;;) {
-                final Node p = node.predecessor();
+            for (;;) { // 死循环
+                final Node p = node.predecessor();// 获取当前线程节点的前继节点
+                /**
+                 * p == head : 表示当前节点已经得到执行符合公平锁的竞争条件
+                 * tryAcquire : 表示判断当前线程是否能够获取到锁
+                 */
                 if (p == head && tryAcquire(arg)) {
                     setHead(node);
                     p.next = null; // help GC
                     failed = false;
                     return interrupted;
                 }
-                if (shouldParkAfterFailedAcquire(p, node) &&
-                    parkAndCheckInterrupt())
+                /**
+                 * 前面已经提到线程唤醒有两种方式，第一种情况发生那么可能的原因是前继节点状态有问题而无法获取到，第二种情况发生那么表示当前线程需要被阻塞中断；下面就是判断逻辑
+                 */
+                if (shouldParkAfterFailedAcquire(p, node) && //获取锁失败后判断当前线程是否应该阻塞
+                    parkAndCheckInterrupt()) //阻塞并且返回当前线程是否被中断
                     interrupted = true;
             }
         } finally {
@@ -1258,10 +1278,10 @@ public abstract class AbstractQueuedSynchronizer
      * @return the value returned from {@link #tryRelease}
      */
     public final boolean release(int arg) {
-        if (tryRelease(arg)) {
+        if (tryRelease(arg)) {// 释放锁
             Node h = head;
             if (h != null && h.waitStatus != 0)
-                unparkSuccessor(h);
+                unparkSuccessor(h); //唤醒后继节点
             return true;
         }
         return false;
