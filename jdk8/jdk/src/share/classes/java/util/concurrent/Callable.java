@@ -45,9 +45,11 @@ package java.util.concurrent;
  * instances are potentially executed by another thread.  A
  * {@code Runnable}, however, does not return a result and cannot
  * throw a checked exception.
+ * Callable接口和Runnable接口相似，都是设计给线程执行的
  *
  * <p>The {@link Executors} class contains utility methods to
  * convert from other common forms to {@code Callable} classes.
+ * Executors类包含了一个工具转换器：Runnable -> Callable
  *
  * @see Executor
  * @since 1.5

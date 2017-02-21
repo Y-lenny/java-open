@@ -81,6 +81,11 @@ public class Executors {
      * execute subsequent tasks.  The threads in the pool will exist
      * until it is explicitly {@link ExecutorService#shutdown shutdown}.
      *
+     * 创建一个拥有固定线程数量和任务共享队列的线程池。大部分时间内的大多数线程都是在执行任务；然而在所有的线程
+     * 都在执行任务的时候又新增了一个任务那么这个任务将会被放入到等待队列中进行等待直到有一个线程可用才执行
+     * 假如在线程被终止了并且需要处理该线程执行的子任务那么将会使用一个新的线程来取代被终止线程。
+     * 线程在池子中将会一直存在直到shutdown被执行了
+     *
      * @param nThreads the number of threads in the pool
      * @return the newly created thread pool
      * @throws IllegalArgumentException if {@code nThreads <= 0}
@@ -165,6 +170,13 @@ public class Executors {
      * {@code newFixedThreadPool(1)} the returned executor is
      * guaranteed not to be reconfigurable to use additional threads.
      *
+     * 创建了一个单工作线程的且有一个无限制大小的任务队列的执行器
+     * 注意：假如这个单线程被操作终止了那么将会产生一个新的线程去取代被终止线程。
+     * 任务是被有序的执行，并且任何时候都不会存在多余一个任务正在执行的
+     * 这个执行器是不具有去重新配置额外线程的
+     *
+     *
+     *
      * @return the newly created single-threaded Executor
      */
     public static ExecutorService newSingleThreadExecutor() {
@@ -209,6 +221,14 @@ public class Executors {
      * not consume any resources. Note that pools with similar
      * properties but different details (for example, timeout parameters)
      * may be created using {@link ThreadPoolExecutor} constructors.
+     *
+     * 创建线程池的同时会根据需要创建线程，但是会重用以前的可用线程。线程池为了提升程序性能而会执行一些短期的异步任务
+     * 假如先前创建的线程可用，那么在调用execute时会复用线程。假如没有可用线程那么将会创建新的线程并添加到队列中
+     * 假如线程在60秒内还未被使用那么他将会被终止并移除线程池。因此线程池闲置很长时间也不会存在资源的浪费的。
+     * 注意：线程池相似但是有细节的差别例如：timeout参数等
+     *
+     * 1、该线程池使用{@link SynchronousQueue}此种类型直接提交策略的缓冲队列，而另外使用的是{@link LinkedBlockingDeque}此类型是无界的缓冲队列
+     * 2、使用的是同种的构造函数创建：所以线程性质相同
      *
      * @return the newly created thread pool
      */
@@ -276,6 +296,9 @@ public class Executors {
     /**
      * Creates a thread pool that can schedule commands to run after a
      * given delay, or to execute periodically.
+     *
+     * 创建一个能够使用调度命令的方式在给定延时或者提前执行的固定大小线程池
+     *
      * @param corePoolSize the number of threads to keep in the pool,
      * even if they are idle
      * @return a newly created scheduled thread pool
@@ -499,6 +522,10 @@ public class Executors {
 
     /**
      * A callable that runs given task and returns given result
+     * 适配器设计模式：将一个类的接口转换成客户希望的另外一个接口，适配器让原本不兼容的类可以合。作无间：RunnableAdapter
+     * 装饰模式：动态的将责任附加到对象上，若要扩展功能，装饰者提供了比继承更有弹性的替代方案：I/O流
+     * 模板模式：在一个方法中定义一个算法结构，而将一些步骤延迟到子类中。模板方法使得子类可以再不改变算法结构的情况下，重新定义算法的某些步骤：Servlet Api
+     *
      */
     static final class RunnableAdapter<T> implements Callable<T> {
         final Runnable task;
@@ -592,6 +619,7 @@ public class Executors {
 
     /**
      * The default thread factory
+     * 线程工厂
      */
     static class DefaultThreadFactory implements ThreadFactory {
         private static final AtomicInteger poolNumber = new AtomicInteger(1);
@@ -661,6 +689,9 @@ public class Executors {
     /**
      * A wrapper class that exposes only the ExecutorService methods
      * of an ExecutorService implementation.
+     * 包装已有实现类，然后只暴露ExecutorService方法
+     * 装饰者模式：{@link RunnableAdapter}.
+     *
      */
     static class DelegatedExecutorService extends AbstractExecutorService {
         private final ExecutorService e;
