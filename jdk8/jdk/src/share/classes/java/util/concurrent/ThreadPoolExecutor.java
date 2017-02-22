@@ -444,6 +444,12 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * 这个队列用于容纳任务并且把任务交接给工作进程。通过workQueue.isEmpty()方法判断队列是否为空（所以我们必须通过这种方式来决定是否需要
      * 进行状态由SHUTDOWN 到 TIDYING转变）。对于DelayQueues队列在任务时间还未到达时poll()方法也会返回空值即使有任务在等待。
      *
+     * BlockingQueue主要有四种实现：
+     * 1、直接任务提交：SynchronousQueue队列，任务直接提交给工作线程，中间无缓冲区；maxPoolSize设置无界避免新任务提交无线程处理，此队列规避了任务之间存在依赖而产生锁关联？
+     * 2、无边界队列：LinkedBlockingQueue队列，任务进入缓冲区，适用于任务之间独立运行、突高并发量的任务请求？
+     * 3、有界队列：ArrayBlockingQueue队列，限定资源但不易调整队列大小，资源请求平整？
+     * ....
+     *
      */
     private final BlockingQueue<Runnable> workQueue;
 
@@ -523,12 +529,18 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * will want to perform clean pool shutdown to clean up.  There
      * will likely be enough memory available for the cleanup code to
      * complete without encountering yet another OutOfMemoryError.
+     *
+     * 线程的创建工厂
+     *
      */
     private volatile ThreadFactory threadFactory;
 
     /**
      * Handler called when saturated or shutdown in execute.
      *  拒绝策略的处理句柄
+     *
+     *
+     *
      */
     private volatile RejectedExecutionHandler handler;
 
@@ -549,6 +561,23 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * for work.
      */
     private volatile boolean allowCoreThreadTimeOut;
+
+    //------------------corePoolSize/maximumPoolSize/defaultHandler协调处理-----------------------
+
+    /**
+     *
+     * 新任务提交线程策略数策略：
+     * 1、如果运行线程数小于corePoolSize，那么即使当前线程池中有闲置线程也会创建新的线程用于执行新请求
+     * 2、如果corePoolSize、maximumPoolSize相同表示线程池线程数固定，当线程池都在执行任务那么新请求将会放入workQueue队列中
+     * 3、如果运行线程数大于corePoolSize且小于maximumPoolSize,只有当workQueue队列请求已满时才回去创建新线程用于执行新请求
+     * 4、如果运行的线程多于corePoolSize且等于maximumPoolSize，若队列已经满了，则通过handler所指定的策略来处理新请求
+     * 5、如果将maximumPoolSize设置为基本的无界值（如 Integer.MAX_VALUE），则允许池适应任意数量的并发任务
+     *
+     * 结论：
+     *  1、核心线程corePoolSize > 任务队列workQueue > 最大线程maximumPoolSize，如果三者都满了，使用handler处理被拒绝的任务
+     *  2、当池中的线程数大于corePoolSize的时候，多余的线程会等待keepAliveTime长的时间，如果无请求可处理就自行销毁
+     *
+     */
 
     /**
      * Core pool size is the minimum number of workers to keep alive
@@ -571,9 +600,13 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 
     /**
      * The default rejected execution handler
+     *
+     * 拒绝执行处理器
+     *
      */
     private static final RejectedExecutionHandler defaultHandler =
         new AbortPolicy();
+    //------------------corePoolSize/maximumPoolSize/defaultHandler协调处理-----------------------
 
     /**
      * Permission required for callers of shutdown and shutdownNow.
@@ -2032,6 +2065,9 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * directly in the calling thread of the {@code execute} method,
      * unless the executor has been shut down, in which case the task
      * is discarded.
+     *
+     * 任务遭到拒绝通过重新在被调用的方法中执行被拒绝的任务但是必须确保executor没有被shutdown否则任务被删除;此策略提供简单的反馈控制机制，能够减缓新任务的提交速度
+     *
      */
     public static class CallerRunsPolicy implements RejectedExecutionHandler {
         /**
@@ -2055,6 +2091,9 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 
     /**
      * A handler for rejected tasks that throws a
+     *
+     * 任务遭到拒绝处理通过抛出异常的方式
+     *
      * {@code RejectedExecutionException}.
      */
     public static class AbortPolicy implements RejectedExecutionHandler {
@@ -2080,6 +2119,9 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
     /**
      * A handler for rejected tasks that silently discards the
      * rejected task.
+     *
+     * 任务遭到拒绝处理通过删除被拒绝 任务
+     *
      */
     public static class DiscardPolicy implements RejectedExecutionHandler {
         /**
@@ -2101,6 +2143,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * A handler for rejected tasks that discards the oldest unhandled
      * request and then retries {@code execute}, unless the executor
      * is shut down, in which case the task is discarded.
+     *
      */
     public static class DiscardOldestPolicy implements RejectedExecutionHandler {
         /**
@@ -2113,6 +2156,8 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
          * would otherwise execute, if one is immediately available,
          * and then retries execution of task r, unless the executor
          * is shut down, in which case task r is instead discarded.
+         *
+         * 如果执行程序尚未关闭，则位于工作队列头部的任务将被删除，然后重试执行程序（如果再次失败，则重复此过程）
          *
          * @param r the runnable task requested to be executed
          * @param e the executor attempting to execute this task

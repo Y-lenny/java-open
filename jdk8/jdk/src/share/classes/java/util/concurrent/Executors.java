@@ -619,7 +619,7 @@ public class Executors {
 
     /**
      * The default thread factory
-     * 线程工厂
+     * 默认的线程工厂
      */
     static class DefaultThreadFactory implements ThreadFactory {
         private static final AtomicInteger poolNumber = new AtomicInteger(1);
@@ -636,12 +636,20 @@ public class Executors {
                          "-thread-";
         }
 
+        /**
+         * 给线程池创建新的执行任务线程
+         *
+         */
         public Thread newThread(Runnable r) {
+
+            //指定线程参数：线程组、任务、线程名称、栈大小
             Thread t = new Thread(group, r,
                                   namePrefix + threadNumber.getAndIncrement(),
                                   0);
+            //设置为非守护线程
             if (t.isDaemon())
                 t.setDaemon(false);
+            //设置线程优先级
             if (t.getPriority() != Thread.NORM_PRIORITY)
                 t.setPriority(Thread.NORM_PRIORITY);
             return t;
