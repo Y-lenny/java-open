@@ -38,9 +38,15 @@ import java.util.List;
 import java.util.Collection;
 
 /**
+ *
+ * 由于Executor在执行任务是直接通过创建线程执行任务的，但是对于异步方式提交任务时不能够立马执行的；但是为了更好的管理任务调度提供了
+ * 任务执行周期的管理拓展接口
+ *
  * An {@link Executor} that provides methods to manage termination and
  * methods that can produce a {@link Future} for tracking progress of
  * one or more asynchronous tasks.
+ *
+ * 该接口提供了管理任务终止和路由异步任务（通过Future返回值）的方法
  *
  * <p>An {@code ExecutorService} can be shut down, which will cause
  * it to reject new tasks.  Two different methods are provided for
@@ -52,6 +58,7 @@ import java.util.Collection;
  * tasks awaiting execution, and no new tasks can be submitted.  An
  * unused {@code ExecutorService} should be shut down to allow
  * reclamation of its resources.
+ *
  *
  * <p>Method {@code submit} extends base method {@link
  * Executor#execute(Runnable)} by creating and returning a {@link Future}

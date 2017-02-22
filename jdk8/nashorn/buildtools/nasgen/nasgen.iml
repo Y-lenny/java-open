@@ -8,14 +8,10 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="golden" level="project" />
+    <orderEntry type="module" module-name="share1" />
     <orderEntry type="module" module-name="nashorn" />
     <orderEntry type="module" module-name="compiler" />
-    <orderEntry type="module" module-name="solaris" />
     <orderEntry type="module" module-name="windows" />
-    <orderEntry type="module" module-name="share3" />
-  </component>
-  <component name="sonarModuleSettings">
-    <option name="localAnalysisScripName" value="&lt;PROJECT&gt;" />
-    <option name="serverName" value="&lt;PROJECT&gt;" />
+    <orderEntry type="module" module-name="solaris" />
   </component>
 </module>

@@ -431,15 +431,19 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
     }
 
     /**
-     * The queue used for holding tasks and handing off to worker
+     * The queue used for holding tasks and handing off（交接） to worker
      * threads.  We do not require that workQueue.poll() returning
      * null necessarily means that workQueue.isEmpty(), so rely
-     * solely on isEmpty to see if the queue is empty (which we must
+     * solely（单独的、唯一的） on isEmpty to see if the queue is empty (which we must
      * do for example when deciding whether to transition from
-     * SHUTDOWN to TIDYING).  This accommodates special-purpose
+     * SHUTDOWN to TIDYING).  This accommodates（容纳；使适应；供应；调解） special-purpose
      * queues such as DelayQueues for which poll() is allowed to
      * return null even if it may later return non-null when delays
      * expire.
+     *
+     * 这个队列用于容纳任务并且把任务交接给工作进程。通过workQueue.isEmpty()方法判断队列是否为空（所以我们必须通过这种方式来决定是否需要
+     * 进行状态由SHUTDOWN 到 TIDYING转变）。对于DelayQueues队列在任务时间还未到达时poll()方法也会返回空值即使有任务在等待。
+     *
      */
     private final BlockingQueue<Runnable> workQueue;
 
@@ -455,29 +459,44 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * also hold mainLock on shutdown and shutdownNow, for the sake of
      * ensuring workers set is stable while separately checking
      * permission to interrupt and actually interrupting.
+     *
+     * 互斥锁：
+     *
      */
     private final ReentrantLock mainLock = new ReentrantLock();
 
     /**
      * Set containing all worker threads in pool. Accessed only when
      * holding mainLock.
+     *
+     * 所有的工作线程都被攘括在此，但是访问线程时必须得拿到锁
+     *
      */
     private final HashSet<Worker> workers = new HashSet<Worker>();
 
     /**
      * Wait condition to support awaitTermination
+     *
+     * 终止条件
+     *
      */
     private final Condition termination = mainLock.newCondition();
 
     /**
      * Tracks largest attained pool size. Accessed only under
      * mainLock.
+     *
+     * 线程池中线程数量曾经达到过的最大值。
+     *
      */
     private int largestPoolSize;
 
     /**
      * Counter for completed tasks. Updated only on termination of
      * worker threads. Accessed only under mainLock.
+     *
+     * 统计完成的任务，当工作线程终止且需要获取锁情况下才进行更新操作
+     *
      */
     private long completedTaskCount;
 
@@ -509,6 +528,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 
     /**
      * Handler called when saturated or shutdown in execute.
+     *  拒绝策略的处理句柄
      */
     private volatile RejectedExecutionHandler handler;
 
@@ -517,6 +537,9 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * Threads use this timeout when there are more than corePoolSize
      * present or if allowCoreThreadTimeOut. Otherwise they wait
      * forever for new work.
+     *
+     * 线程空闲时等待任务的过期时间
+     *
      */
     private volatile long keepAliveTime;
 
@@ -531,12 +554,18 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * Core pool size is the minimum number of workers to keep alive
      * (and not allow to time out etc) unless allowCoreThreadTimeOut
      * is set, in which case the minimum is zero.
+     *
+     * 线程池维护线程的最小数量，哪怕是空闲的
+     *
      */
     private volatile int corePoolSize;
 
     /**
      * Maximum pool size. Note that the actual maximum is internally
      * bounded by CAPACITY.
+     *
+     * 线程池维护的最大线程数量
+     *
      */
     private volatile int maximumPoolSize;
 
