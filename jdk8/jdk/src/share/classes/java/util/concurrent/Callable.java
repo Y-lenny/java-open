@@ -51,6 +51,14 @@ package java.util.concurrent;
  * convert from other common forms to {@code Callable} classes.
  * Executors类包含了一个工具转换器：Runnable -> Callable
  *
+ * Callable接口代表一段可以调用并返回结果的代码;Future接口表示异步任务，是还没有完成的任务给出的未来结果。所以说Callable用于产生结果，Future用于获取结果。
+ *
+ * Callable接口使用泛型去定义它的返回类型。Executors类提供了一些有用的方法在线程池中执行Callable内的任务。
+ * 由于Callable任务是并行的（并行就是整体看上去是并行的，其实在某个时间点只有一个线程在执行），我们必须等待它返回的结果。
+ *
+ * java.util.concurrent.Future对象为我们解决了这个问题。
+ * 在线程池提交Callable任务后返回了一个Future对象，使用它可以知道Callable任务的状态和得到Callable返回的执行结果。Future提供了get()方法让我们可以等待Callable结束并获取它的执行结果。
+ *
  * @see Executor
  * @since 1.5
  * @author Doug Lea
@@ -64,5 +72,5 @@ public interface Callable<V> {
      * @return computed result
      * @throws Exception if unable to compute a result
      */
-    V call() throws Exception;
+    V call() throws Exception; // 计算结果
 }

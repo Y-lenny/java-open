@@ -56,6 +56,12 @@ import java.util.concurrent.locks.LockSupport;
  * {@code protected} functionality that may be useful when creating
  * customized task classes.
  *
+ * 如果不想分支线程阻塞主线程，又想取得分支线程的执行结果，就用FutureTask
+ *
+ * 提供了两个构造函数：一个以Callable为参数，另外一个以Runnable为参数。
+ *  这些类之间的关联对于任务建模的办法非常灵活，允许你基于FutureTask的Runnable特性（因为它实现了Runnable接口），
+ *  把任务写成Callable，然后封装进一个由执行者调度并在必要时可以取消的FutureTask。FutureTask可以由执行者调度，这一点很关键。
+ *
  * @since 1.5
  * @author Doug Lea
  * @param <V> The result type returned by this FutureTask's {@code get} methods
@@ -125,6 +131,8 @@ public class FutureTask<V> implements RunnableFuture<V> {
     /**
      * Creates a {@code FutureTask} that will, upon running, execute the
      * given {@code Callable}.
+     *
+     *
      *
      * @param  callable the callable task
      * @throws NullPointerException if the callable is null

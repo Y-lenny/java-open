@@ -535,6 +535,11 @@ public abstract class AbstractQueuedSynchronizer
 
     /**
      * The synchronization state.
+     *
+     * 锁的状态值：
+     *  1、加锁 + 1
+     *  2、释放锁 - 1
+     *
      */
     private volatile int state;
 
