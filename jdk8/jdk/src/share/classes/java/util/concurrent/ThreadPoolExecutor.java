@@ -323,12 +323,19 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      *   workerCount, indicating the effective number of threads
      *   runState,    indicating whether running, shutting down etc
      *
+     * 主线程池状态控制器：ctl，由一个AtomicInteger包装ctl(参数1，参数2)
+     *  workCount，指示有效的线程数量
+     *  runState, 指示线程池的状态
+     *
      * In order to pack them into one int, we limit workerCount to
      * (2^29)-1 (about 500 million) threads rather than (2^31)-1 (2
      * billion) otherwise representable. If this is ever an issue in
      * the future, the variable can be changed to be an AtomicLong,
      * and the shift/mask constants below adjusted. But until the need
      * arises, this code is a bit faster and simpler using an int.
+     *
+     * 为了能够通过一个int类型包装他们，限制工作线程数为(2^29)-1
+     *
      *
      * The workerCount is the number of workers that have been
      * permitted to start and not permitted to stop.  The value may be
@@ -337,6 +344,11 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * asked, and when exiting threads are still performing
      * bookkeeping before terminating. The user-visible pool size is
      * reported as the current size of the workers set.
+     *
+     * 这个workerCount包括已经被允许而开始的和已经被阻止而暂停的工作线程总和
+     * 这个值可能不同于实际的存活的线程数，举例：
+     * 当要求线程工厂创建线程而失败，在线程终止前线程退出时是被一直记录着的
+     * 用户访问得到的池子大小是当前工作线程集合的尺寸大小
      *
      * The runState provides the main lifecycle control, taking on values:
      *
@@ -349,9 +361,13 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      *             will run the terminated() hook method
      *   TERMINATED: terminated() has completed
      *
+     * runState提供了主生命周期状态，包含如下值：
+     *
      * The numerical order among these values matters, to allow
      * ordered comparisons. The runState monotonically increases over
      * time, but need not hit each state. The transitions are:
+     *
+     *
      *
      * RUNNING -> SHUTDOWN
      *    On invocation of shutdown(), perhaps implicitly in finalize()
