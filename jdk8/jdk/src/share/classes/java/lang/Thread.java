@@ -352,11 +352,16 @@ class Thread implements Runnable {
     /**
      * Initializes a Thread.
      *
+     * 初始化线程
+     *
      * @param g the Thread group
+     * 线程组
      * @param target the object whose run() method gets called
      * @param name the name of the new Thread
+     * 新线程名称
      * @param stackSize the desired stack size for the new thread, or
      *        zero to indicate that this parameter is to be ignored.
+     *  对于新线程所需要的栈容量大小
      * @param acc the AccessControlContext to inherit, or
      *            AccessController.getContext() if null
      */
@@ -706,7 +711,12 @@ class Thread implements Runnable {
 
         /* Notify the group that this thread is about to be started
          * so that it can be added to the group's list of threads
-         * and the group's unstarted count can be decremented. */
+         * and the group's unstarted count can be decremented.
+         *
+         * 通知线程组当前线程将要被开始，所以它能够被加入到线程组列表当中并且把未开启的线程数量 - 1
+         *
+         */
+
         group.add(this);
 
         boolean started = false;

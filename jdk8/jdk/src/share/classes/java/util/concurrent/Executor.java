@@ -122,6 +122,8 @@ package java.util.concurrent;
  * <a href="package-summary.html#MemoryVisibility"><i>happen-before</i></a>
  * its execution begins, perhaps in another thread.
  *
+ * Executor框架是一个根据一组执行策略调用，调度、执行和控制的异步任务的框架。Executor存在的目的是提供一种将"任务提交"与"任务如何运行"分离开来的机制
+ *
  * @since 1.5
  * @author Doug Lea
  */

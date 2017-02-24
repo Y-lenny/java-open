@@ -681,6 +681,9 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * 我们实现了一个简单的非重入互斥锁而不是使用ReentrantLock（重入锁（多条件、等待可中断、公平）），...？
      * 另外。为了压制中断直到线程实际开启并运行任务，我们初始化了一个负值的状态并开始时清除他 ？
      *
+     * 装饰者模式：对线程进行强化功能，保证线程执行多任务数据统计正确性
+     *
+     *
      *
      */
     private final class Worker
@@ -707,6 +710,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
         Worker(Runnable firstTask) {
             setState(-1); // inhibit interrupts until runWorker
             this.firstTask = firstTask;
+            // 把当前对象作为线程的执行对象，线程持有当前对象的引用，thread.start()时就可以进行run()方法 715 调用
             this.thread = getThreadFactory().newThread(this);
         }
 
@@ -1080,7 +1084,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
                         (rs == SHUTDOWN && firstTask == null)) {
                         if (t.isAlive()) // precheck that t is startable
                             throw new IllegalThreadStateException();
-                        workers.add(w);// 吧线程添加到Set集合中
+                        workers.add(w);// 把线程添加到Set集合中
                         int s = workers.size();
                         if (s > largestPoolSize)
                             largestPoolSize = s; //当池中的工作线程创新高时，会将这个数记录到largestPoolSize字段中。然后就可以启动这个线程t了
@@ -1090,7 +1094,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
                     mainLock.unlock();
                 }
                 if (workerAdded) {
-                    t.start();
+                    t.start(); //new Thead() —Thread.start() 701 —> Ready+Runnable—task.run()—>terminated <==> Thread.run()
                     workerStarted = true;
                 }
             }
@@ -1173,7 +1177,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
                 if (workerCountOf(c) >= min)
                     return; // replacement not needed
             }
-            //直接加个线程
+            //直接加个空任务线程到线程池当中
             addWorker(null, false);
         }
     }
@@ -1191,6 +1195,12 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      *    {@code allowCoreThreadTimeOut || workerCount > corePoolSize})
      *    both before and after the timed wait, and if the queue is
      *    non-empty, this worker is not the last thread in the pool.
+     *
+     * 执行可能会阻塞或者有限时间的等待任务，依赖于当前的配置信息，或许会返回为空假如当前工作线程必须因为如下原因而退出：
+     *  1、没有多余maximumPoolSize的工作线程(可能被setMaximumPoolSize重新设置值了)
+     *  2、线程池stop了
+     *  3、线程池shutdown并且队列为空
+     *  3、工作线程已经超过了自身等待任务的时间限制，而终止；假如队列不为空但是工作线程不是线程池中的最后一个
      *
      * @return task, or null if the worker must exit, in which case
      *         workerCount is decremented
@@ -1275,7 +1285,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * user code.
      *
      * 执行Worker中的任务，它的执行流程是这样的：
-     *  若存在第一个任务，则先执行第一个任务，否则，从队列中拿任务，不断的执行，直到getTask()返回null或执行任务出错（中断或任务本身抛出异常），就退出while循环。
+     * 若存在第一个任务，则先执行第一个任务，否则，从队列中拿任务，不断的执行，直到getTask()返回null或执行任务出错（中断或任务本身抛出异常），就退出while循环。
      *
      * @param w the worker
      */
@@ -1287,7 +1297,10 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
         // 用于判断线程是否由于异常终止，如果不是异常终止，在后面将会将该变量的值改为false，该变量的值在processWorkerExit()会使用来判断线程是否由于异常终止
         boolean completedAbruptly = true;
         try {
-            // 执行任务，直到getTask()返回的值为null，在此处就相当于复用了线程，让线程执行了多个任务
+            /**
+             * 循环调用getTask()方法获取workQueue队列中的任务列表，直到返回null才终止
+             * 此处相当于进行一个线程去执行了多个任务 线程复用
+             */
             while (task != null || (task = getTask()) != null) {
                 w.lock();
                 // If pool is stopping, ensure thread is interrupted;
@@ -1303,7 +1316,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
                     beforeExecute(wt, task);//在任务执行前需要做的逻辑方法，该方面可以由用户进行重写自定义
                     Throwable thrown = null;
                     try {
-                        task.run(); //开始执行任务
+                        task.run(); // new Thead() —thread.start()—> Ready+Runnable—task.run()—>terminated <==> Thread.run() 753
                     } catch (RuntimeException x) {
                         thrown = x; throw x;
                     } catch (Error x) {
