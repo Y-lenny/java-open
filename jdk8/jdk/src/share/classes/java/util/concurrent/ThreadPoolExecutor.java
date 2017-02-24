@@ -1566,8 +1566,8 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
             int recheck = ctl.get();
 
             /*
-             * 如果 线程池已经处于非运行状态,则从缓冲队列中移除任务然后采用线程池指定的策略拒绝任务
-             * 如果 线程池中线程数量为0,则通过addWorker(null, false)尝试新建一个线程,新建线程对应的任务为null
+             * 如果线程池已经处于非运行状态,则从缓冲队列中移除任务然后采用线程池指定的策略拒绝任务
+             * 如果线程池中线程数量为0,则通过addWorker(null, false)尝试新建一个线程,新建线程对应的任务为null
              */
             if (!isRunning(recheck) && remove(command))
                 reject(command);
