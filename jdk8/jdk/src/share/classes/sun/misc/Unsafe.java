@@ -403,7 +403,7 @@ public final class Unsafe {
      * Stores a value into a given memory address.  If the address is zero, or
      * does not point into a block obtained from {@link #allocateMemory}, the
      * results are undefined.
-     *
+     * 保存一个值到指定的内存地址；假如地址为0或者没有指定到一个从allocateMemory获得的块那么结果将会返回未定义
      * @see #getByte(long)
      */
     public native void    putByte(long address, byte x);

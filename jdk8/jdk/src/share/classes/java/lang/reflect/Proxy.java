@@ -659,17 +659,33 @@ public class Proxy implements java.io.Serializable {
      * that dispatches method invocations to the specified invocation
      * handler.
      *
+     * 返回拥有指定接口的代理类实例，代理对象能够传递代理方法到特定的invocation handler中
+     *
      * <p>{@code Proxy.newProxyInstance} throws
      * {@code IllegalArgumentException} for the same reasons that
      * {@code Proxy.getProxyClass} does.
      *
      * @param   loader the class loader to define the proxy class
+     *
+     * 定义代理对象的类加载器
+     *
      * @param   interfaces the list of interfaces for the proxy class
      *          to implement
+     *
+     * 给代理对象去实现的接口列表
+     *
      * @param   h the invocation handler to dispatch method invocations to
+     *
+     * 这invocation handler是用来传递代理对象方法调用的
+     *
+     *
      * @return  a proxy instance with the specified invocation handler of a
      *          proxy class that is defined by the specified class loader
      *          and that implements the specified interfaces
+     *
+     * 代理对象拥有指定被代理类的invocation handler，在class loader和interface中指定的
+     *
+     *
      * @throws  IllegalArgumentException if any of the restrictions on the
      *          parameters that may be passed to {@code getProxyClass}
      *          are violated

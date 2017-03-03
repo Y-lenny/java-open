@@ -34,6 +34,9 @@ package java.lang.reflect;
  * invocation is encoded and dispatched to the {@code invoke}
  * method of its invocation handler.
  *
+ * 每个代理对象都有一个invocation handler所关联，当代理对象的方法被invoke时；这个方法将会被编码并且传递给代理对象所关联的invocation handler的invoke方法中；
+ *
+ *
  * @author      Peter Jones
  * @see         Proxy
  * @since       1.3

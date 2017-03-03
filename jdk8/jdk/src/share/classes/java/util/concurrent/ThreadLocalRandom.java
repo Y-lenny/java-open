@@ -161,6 +161,7 @@ public class ThreadLocalRandom extends Random {
 
     /**
      * The increment of seeder per new instance
+     * 每创建一个新的实例都会让种子增长
      */
     private static final long SEEDER_INCREMENT = 0xbb67ae8584caa73bL;
 
@@ -203,18 +204,23 @@ public class ThreadLocalRandom extends Random {
      * thread local seed value needs to be generated. Note that even
      * though the initialization is purely thread-local, we need to
      * rely on (static) atomic generators to initialize the values.
+     *
+     * 针对于当前线程创建线程域；只有在Prode探针为0时才进行调用；指示本地线程的种子值；
+     * 注意：尽管这个初始化时在本地线程，但是我们还是依赖于静态的原子生成器进行初始化值
      */
     static final void localInit() {
         int p = probeGenerator.addAndGet(PROBE_INCREMENT);
         int probe = (p == 0) ? 1 : p; // skip 0
         long seed = mix64(seeder.getAndAdd(SEEDER_INCREMENT));
         Thread t = Thread.currentThread();
-        UNSAFE.putLong(t, SEED, seed);
-        UNSAFE.putInt(t, PROBE, probe);
+        UNSAFE.putLong(t, SEED, seed); // 把种子放入本地线程
+        UNSAFE.putInt(t, PROBE, probe);// 把探针放入本地线程
     }
 
     /**
      * Returns the current thread's {@code ThreadLocalRandom}.
+     *
+     * 返回当前线程的ThreadLocalRandom实例，假如当前探针为0时则调用本地初始化
      *
      * @return the current thread's {@code ThreadLocalRandom}
      */
@@ -236,6 +242,9 @@ public class ThreadLocalRandom extends Random {
             throw new UnsupportedOperationException();
     }
 
+    /**
+     * 从本地线程当中取值，所以不存在线程安全问题
+     */
     final long nextSeed() {
         Thread t; long r; // read and update per-thread seed
         UNSAFE.putLong(t = Thread.currentThread(), SEED,
@@ -434,6 +443,8 @@ public class ThreadLocalRandom extends Random {
     /**
      * Returns a pseudorandom {@code double} value between zero
      * (inclusive) and one (exclusive).
+     *
+     * 返回一个伪随机数，值在：[0,1)之间
      *
      * @return a pseudorandom {@code double} value between zero
      *         (inclusive) and one (exclusive)
