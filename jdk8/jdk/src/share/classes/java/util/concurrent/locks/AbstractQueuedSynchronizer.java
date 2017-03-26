@@ -377,7 +377,8 @@ public abstract class AbstractQueuedSynchronizer
      * expert group, for helpful ideas, discussions, and critiques
      * on the design of this class.
      */
-    static final class Node {
+    static final class
+    Node {
         /** Marker to indicate a node is waiting in shared mode */
         //标识某个节点是在共享模式中等待
         static final Node SHARED = new Node();
@@ -887,7 +888,7 @@ public abstract class AbstractQueuedSynchronizer
              * 2、线程中断：当线程被中断以后线程也会被唤醒，但是为了公平锁的绝对公平线程的唤醒必须是第一种情况；所以下面进行线程中断检查方法
              */
             boolean interrupted = false;
-            for (;;) { // 死循环
+            for (;;) { // 阻塞
                 final Node p = node.predecessor();// 获取当前线程节点的前继节点
                 /**
                  * p == head : 表示当前节点已经得到执行符合公平锁的竞争条件

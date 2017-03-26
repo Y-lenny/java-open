@@ -402,8 +402,8 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
     private static final int CAPACITY   = (1 << COUNT_BITS) - 1; //最大活动线程数: 00001111 11111111 11111111 11111111 = 2^(29) -1
 
     // runState is stored in the high-order bits
-    private static final int RUNNING    = -1 << COUNT_BITS; //    11100000 00000000 00000000 00000000
-    private static final int SHUTDOWN   =  0 << COUNT_BITS; //   00000000 00000000 00000000 00000000
+    private static final int RUNNING    = -1 << COUNT_BITS; //     11100000 00000000 00000000 00000000
+    private static final int SHUTDOWN   =  0 << COUNT_BITS; //    00000000 00000000 00000000 00000000
     private static final int STOP       =  1 << COUNT_BITS; //   00100000 00000000 00000000 00000000
     private static final int TIDYING    =  2 << COUNT_BITS;//   01000000 00000000 00000000 00000000
     private static final int TERMINATED =  3 << COUNT_BITS;//  01100000 00000000 00000000 00000000
@@ -468,9 +468,9 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * 进行状态由SHUTDOWN 到 TIDYING转变）。对于DelayQueues队列在任务时间还未到达时poll()方法也会返回空值即使有任务在等待。
      *
      * BlockingQueue主要有四种实现：
-     * 1、直接任务提交：SynchronousQueue队列，任务直接提交给工作线程，中间无缓冲区；maxPoolSize设置无界避免新任务提交无线程处理，此队列规避了任务之间存在依赖而产生锁关联？
-     * 2、无边界队列：LinkedBlockingQueue队列，任务进入缓冲区，适用于任务之间独立运行、突高并发量的任务请求？
-     * 3、有界队列：ArrayBlockingQueue队列，限定资源但不易调整队列大小，资源请求平整？
+     * 1、直接任务提交：${@link SynchronousQueue}队列，任务直接提交给工作线程，中间无缓冲区；maxPoolSize设置无界避免新任务提交无线程处理，此队列规避了任务之间存在依赖而产生锁关联？
+     * 2、无边界队列：${@link LinkedBlockingQueue}队列，任务进入缓冲区，适用于任务之间独立运行、突高并发量的任务请求？
+     * 3、有界队列：${@link ArrayBlockingQueue}队列，限定资源但不易调整队列大小，资源请求平整？
      * ....
      *
      */
@@ -1141,7 +1141,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      */
     private void processWorkerExit(Worker w, boolean completedAbruptly) {
 
-        // 如果completedAbruptly值为true，则说明线程是结束于异常,如果不是结束于异常，那么它降在runWorker方法的while循环中的getTask()方法中已经减一了
+        // 如果completedAbruptly值为true，则说明线程是结束于异常,如果不是结束于异常，那么它将在runWorker方法的while循环中的getTask()方法中已经减一了
         if (completedAbruptly) // If abrupt, then workerCount wasn't adjusted
             decrementWorkerCount();
 
@@ -1208,6 +1208,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
     private Runnable getTask() {
         boolean timedOut = false; // Did the last poll() time out?
 
+        // 阻塞，超时退出
         for (;;) {
             int c = ctl.get();
             int rs = runStateOf(c);
