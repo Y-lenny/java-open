@@ -436,9 +436,9 @@ public class CopyOnWriteArrayList<E>
         try {
             Object[] elements = getArray();
             int len = elements.length;
-            Object[] newElements = Arrays.copyOf(elements, len + 1);
-            newElements[len] = e;
-            setArray(newElements);
+            Object[] newElements = Arrays.copyOf(elements, len + 1); // 拷贝出新租住
+            newElements[len] = e; // 对元素组进行修改
+            setArray(newElements); // 替换数组引用
             return true;
         } finally {
             lock.unlock();

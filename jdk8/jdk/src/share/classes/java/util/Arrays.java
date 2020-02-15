@@ -3204,6 +3204,17 @@ public class Arrays {
      *     <tt>original</tt> is not of a runtime type that can be stored in
      *     an array of class <tt>newType</tt>
      * @since 1.6
+     *
+     *
+     * {@link System#arraycopy(Object, int, Object, int, int)} 与 {@link Arrays#copyOf(Object[], int, Class)} 的区别与联系
+     *
+     * 联系：{@link Arrays#copyOf(Object[], int, Class)} 底层还是调用了{@link System#arraycopy(Object, int, Object, int, int)}方法
+     *
+     * 区别：
+     * arraycopy() 需要目标数组，将原数组拷贝到你自己定义的数组里或者原数组，而且可以选择拷贝的起点和长度以及放入新数组中的位置
+     * copyOf() 是系统自动在内部新建一个数组，并返回该数组。copyOf主要基于已有数组进行扩容
+     *
+     *
      */
     public static <T,U> T[] copyOf(U[] original, int newLength, Class<? extends T[]> newType) {
         @SuppressWarnings("unchecked")

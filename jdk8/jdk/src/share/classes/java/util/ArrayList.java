@@ -110,6 +110,7 @@ public class ArrayList<E> extends AbstractList<E>
 
     /**
      * Default initial capacity.
+     * 默认容量大小为10
      */
     private static final int DEFAULT_CAPACITY = 10;
 
@@ -135,6 +136,7 @@ public class ArrayList<E> extends AbstractList<E>
 
     /**
      * The size of the ArrayList (the number of elements it contains).
+     * size代表数组被使用的容量，length代表数组总容量
      *
      * @serial
      */
@@ -148,6 +150,9 @@ public class ArrayList<E> extends AbstractList<E>
      *         is negative
      */
     public ArrayList(int initialCapacity) {
+        /**
+         * 初始化大小假如大于零就初始化指定容量的空数组，假如等于零就初始化容量为0的空数组；否则就抛异常
+         */
         if (initialCapacity > 0) {
             this.elementData = new Object[initialCapacity];
         } else if (initialCapacity == 0) {
@@ -160,6 +165,7 @@ public class ArrayList<E> extends AbstractList<E>
 
     /**
      * Constructs an empty list with an initial capacity of ten.
+     * 默认构造函数，使用初始容量10构造一个空列表(无参数构造)
      */
     public ArrayList() {
         this.elementData = DEFAULTCAPACITY_EMPTY_ELEMENTDATA;
@@ -204,6 +210,9 @@ public class ArrayList<E> extends AbstractList<E>
      * necessary, to ensure that it can hold at least the number of elements
      * specified by the minimum capacity argument.
      *
+     * 可以通过性能测试：对比在添加大量数据前后区别是否调用ensureCapacity方法看执行耗时；
+     * 结论：ArrayList 添加大量元素之前最好先使用ensureCapacity 方法，以减少增量重新分配的次数。
+     *
      * @param   minCapacity   the desired minimum capacity
      */
     public void ensureCapacity(int minCapacity) {
@@ -220,6 +229,9 @@ public class ArrayList<E> extends AbstractList<E>
     }
 
     private void ensureCapacityInternal(int minCapacity) {
+        /**
+         * 假如当前数组是空的就取最小扩容与默认扩容的最大值
+         */
         if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {
             minCapacity = Math.max(DEFAULT_CAPACITY, minCapacity);
         }
@@ -228,9 +240,15 @@ public class ArrayList<E> extends AbstractList<E>
     }
 
     private void ensureExplicitCapacity(int minCapacity) {
+        /**
+         * ？
+         */
         modCount++;
 
         // overflow-conscious code
+        /**
+         * 当最小扩容大于数组长度
+         */
         if (minCapacity - elementData.length > 0)
             grow(minCapacity);
     }
@@ -251,10 +269,22 @@ public class ArrayList<E> extends AbstractList<E>
      */
     private void grow(int minCapacity) {
         // overflow-conscious code
+        /**
+         * 旧容量
+         */
         int oldCapacity = elementData.length;
+        /**
+         * >>1 移位相当于oldCapacity/2，扩容效率更高
+         */
         int newCapacity = oldCapacity + (oldCapacity >> 1);
+        /**
+         * 扩容后还小于最小扩容就使用最小扩容
+         */
         if (newCapacity - minCapacity < 0)
             newCapacity = minCapacity;
+        /**
+         * 扩容后还大于最大数组就使用MAX_SIZE
+         */
         if (newCapacity - MAX_ARRAY_SIZE > 0)
             newCapacity = hugeCapacity(minCapacity);
         // minCapacity is usually close to size, so this is a win:
@@ -450,11 +480,15 @@ public class ArrayList<E> extends AbstractList<E>
 
     /**
      * Appends the specified element to the end of this list.
+     * 把新加元素追加至末尾
      *
      * @param e element to be appended to this list
      * @return <tt>true</tt> (as specified by {@link Collection#add})
      */
     public boolean add(E e) {
+        /**
+         * 扩容+1
+         */
         ensureCapacityInternal(size + 1);  // Increments modCount!!
         elementData[size++] = e;
         return true;

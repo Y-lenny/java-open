@@ -150,7 +150,7 @@ public class ReentrantLock implements Lock, java.io.Serializable {
             if (Thread.currentThread() != getExclusiveOwnerThread()) //判断当前是不是锁的持有者
                 throw new IllegalMonitorStateException();
             boolean free = false;
-            if (c == 0) {//表示锁已被释放
+            if (c == 0) {//其实就是重入的问题，如果c==0，也就是说没有嵌套锁了，可以释放了，否则还不能释放掉
                 free = true;
                 setExclusiveOwnerThread(null);//锁的持有者设置为null
             }
@@ -227,14 +227,17 @@ public class ReentrantLock implements Lock, java.io.Serializable {
         /**
          * Fair version of tryAcquire.  Don't grant access unless
          * recursive call or no waiters or is first.
-         * 公平锁的获取。只有在递归调用或者没有等待者或者是队首情况下获取到锁
+         *
+         * 尝试直接获取锁，返回值是boolean，代表是否获取到锁
+         * 返回true：1.没有线程在等待锁；2.重入锁，线程本来就持有锁，也就可以理所当然可以直接获取
+         *
          */
         protected final boolean tryAcquire(int acquires) {
             final Thread current = Thread.currentThread();
             int c = getState(); //获取锁的当前状态
             if (c == 0) { //表示锁未被占用
                 if (!hasQueuedPredecessors() && //判断当前线程是否是队列中的第一个线程
-                    compareAndSetState(0, acquires)) {// 改变状态
+                    compareAndSetState(0, acquires)) {// 改变状态（volatile + CAS来解决锁获取的线程安全）
                     setExclusiveOwnerThread(current);// 设置锁被当前线程占用
                     return true;
                 }
@@ -243,7 +246,7 @@ public class ReentrantLock implements Lock, java.io.Serializable {
                 int nextc = c + acquires;
                 if (nextc < 0)
                     throw new Error("Maximum lock count exceeded");
-                setState(nextc); // 更新占用锁次数
+                setState(nextc); // 更新占用锁次数，这也说明为什么ReentrantLock是可重入锁的原因了
                 return true;
             }
             return false;

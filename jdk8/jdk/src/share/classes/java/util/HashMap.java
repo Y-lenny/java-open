@@ -274,11 +274,19 @@ public class HashMap<K,V> extends AbstractMap<K,V>
     /**
      * Basic hash bin node, used for most entries.  (See below for
      * TreeNode subclass, and in LinkedHashMap for its Entry subclass.)
+     *
+     * 哈希桶，实现了{@link java.util.Map.Entry}接口，本质就是一个键值对；
      */
     static class Node<K,V> implements Map.Entry<K,V> {
+        /**
+         * 位置
+         */
         final int hash;
         final K key;
         V value;
+        /**
+         * 单向链表，指向下一个节点
+         */
         Node<K,V> next;
 
         Node(int hash, K key, V value, Node<K,V> next) {
@@ -332,6 +340,9 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * cheapest possible way to reduce systematic lossage, as well as
      * to incorporate impact of the highest bits that would otherwise
      * never be used in index calculations because of table bounds.
+     *
+     * Hash算法本质上就是三步：取key的hashCode值、高位运算、取模运算；此方法实现取值、高位，
+     * 其取模在具体使用方法中调用：hash&(length-1) 等同 hash%(length-1) 但效率更高相对mod运算
      */
     static final int hash(Object key) {
         int h;
@@ -373,9 +384,14 @@ public class HashMap<K,V> extends AbstractMap<K,V>
 
     /**
      * Returns a power of two size for the given target capacity.
+     * 返回目标容量的两倍大小
      */
     static final int tableSizeFor(int cap) {
         int n = cap - 1;
+        /**
+         * n = n | (n>>>1) ,相当于在右移位置设置为1；比如cap = 65，1000000 变成 1000001，... 1111111 + 1 相当于 cap 的2两倍(>>>:无符号右移，忽略符号位，空位都以0补齐)
+         * | & ^ ~ 运算符详情：https://www.cnblogs.com/ncznx/p/9163299.html
+         */
         n |= n >>> 1;
         n |= n >>> 2;
         n |= n >>> 4;
@@ -416,6 +432,8 @@ public class HashMap<K,V> extends AbstractMap<K,V>
 
     /**
      * The next size value at which to resize (capacity * load factor).
+     *
+     * threshold = length * Load factor
      *
      * @serial
      */
@@ -600,6 +618,8 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * If the map previously contained a mapping for the key, the old
      * value is replaced.
      *
+     * 插入元素
+     *
      * @param key key with which the specified value is to be associated
      * @param value value to be associated with the specified key
      * @return the previous value associated with <tt>key</tt>, or
@@ -624,21 +644,36 @@ public class HashMap<K,V> extends AbstractMap<K,V>
     final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
                    boolean evict) {
         Node<K,V>[] tab; Node<K,V> p; int n, i;
+        /**
+         * ①.判断键值对数组table[i]是否为空或为null，否则执行resize()进行扩容；
+         */
         if ((tab = table) == null || (n = tab.length) == 0)
             n = (tab = resize()).length;
+        /**
+         * ②.根据键值key计算hash值得到插入的数组索引i，如果table[i]==null，直接新建节点添加，转向⑥，如果table[i]不为空，转向③；
+         */
         if ((p = tab[i = (n - 1) & hash]) == null)
             tab[i] = newNode(hash, key, value, null);
         else {
             Node<K,V> e; K k;
+            /**
+             * ③.判断table[i]的首个元素是否和key一样，如果相同直接覆盖value，否则转向④，这里的相同指的是hashCode以及equals；
+             */
             if (p.hash == hash &&
                 ((k = p.key) == key || (key != null && key.equals(k))))
                 e = p;
+            /**
+             * ④.判断table[i] 是否为treeNode，即table[i] 是否是红黑树，如果是红黑树，则直接在树中插入键值对，否则转向⑤；
+             */
             else if (p instanceof TreeNode)
                 e = ((TreeNode<K,V>)p).putTreeVal(this, tab, hash, key, value);
             else {
                 for (int binCount = 0; ; ++binCount) {
                     if ((e = p.next) == null) {
                         p.next = newNode(hash, key, value, null);
+                        /**
+                         * ⑤.遍历table[i]，判断链表长度是否大于8，大于8的话把链表转换为红黑树，在红黑树中执行插入操作，否则进行链表的插入操作；遍历过程中若发现key已经存在直接覆盖value即可；
+                         */
                         if (binCount >= TREEIFY_THRESHOLD - 1) // -1 for 1st
                             treeifyBin(tab, hash);
                         break;
@@ -658,6 +693,9 @@ public class HashMap<K,V> extends AbstractMap<K,V>
             }
         }
         ++modCount;
+        /**
+         * ⑥.插入成功后，判断实际存在的键值对数量size是否超多了最大容量threshold，如果超过，进行扩容。
+         */
         if (++size > threshold)
             resize();
         afterNodeInsertion(evict);

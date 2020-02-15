@@ -60,6 +60,10 @@ public abstract class AbstractOwnableSynchronizer
 
     /**
      * The current owner of exclusive mode synchronization.
+     *
+     * 代表当前持有独占锁的线程，举个最重要的使用例子，因为锁可以重入
+     * reentrantLock.lock()可以嵌套调用多次，所以每次用这个来判断当前线程是否已经拥有了锁
+     * if (currentThread == getExclusiveOwnerThread()) {state++}
      */
     private transient Thread exclusiveOwnerThread;
 

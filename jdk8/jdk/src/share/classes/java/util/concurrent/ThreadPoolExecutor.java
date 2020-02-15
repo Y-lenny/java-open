@@ -1335,7 +1335,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
             }
             completedAbruptly = false; //线程不是异常终止
         } finally {
-            processWorkerExit(w, completedAbruptly);//结束该线程
+            processWorkerExit(w, completedAbruptly);//
         }
     }
 

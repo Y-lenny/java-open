@@ -54,7 +54,7 @@ import sun.misc.Unsafe;
 public class AtomicInteger extends Number implements java.io.Serializable {
     private static final long serialVersionUID = 6214790243416807050L;
 
-    // setup to use Unsafe.compareAndSwapInt for updates
+    // setup to use Unsafe.ewq for updates
     private static final Unsafe unsafe = Unsafe.getUnsafe();
     private static final long valueOffset;
 
