@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>java.util.concurrent.ThreadPoolExecutor</OriginalElement>
+  <nodes>
+    <node x="0.0" y="162.0">java.util.concurrent.AbstractExecutorService</node>
+    <node x="123.25" y="0.0">java.util.concurrent.Executor</node>
+    <node x="20.0" y="243.0">java.util.concurrent.ThreadPoolExecutor</node>
+    <node x="47.25" y="324.0">java.util.concurrent.ScheduledThreadPoolExecutor</node>
+    <node x="95.25" y="81.0">java.util.concurrent.ExecutorService</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="java.util.concurrent.AbstractExecutorService" target="java.util.concurrent.ExecutorService">
+      <point x="0.0" y="-15.5" />
+      <point x="116.0" y="137.0" />
+      <point x="137.25" y="137.0" />
+      <point x="-42.0" y="15.5" />
+    </edge>
+    <edge source="java.util.concurrent.ScheduledThreadPoolExecutor" target="java.util.concurrent.ThreadPoolExecutor">
+      <point x="-66.0" y="-15.5" />
+      <point x="113.25" y="299.0" />
+      <point x="116.0" y="299.0" />
+      <point x="0.0" y="15.5" />
+    </edge>
+    <edge source="java.util.concurrent.ExecutorService" target="java.util.concurrent.Executor">
+      <point x="0.0" y="-15.5" />
+      <point x="0.0" y="15.5" />
+    </edge>
+    <edge source="java.util.concurrent.ScheduledThreadPoolExecutor" target="java.util.concurrent.ExecutorService">
+      <point x="66.0" y="-15.5" />
+      <point x="245.25" y="299.0" />
+      <point x="242.5" y="299.0" />
+      <point x="242.5" y="137.0" />
+      <point x="221.25" y="137.0" />
+      <point x="42.0" y="15.5" />
+    </edge>
+    <edge source="java.util.concurrent.ThreadPoolExecutor" target="java.util.concurrent.AbstractExecutorService">
+      <point x="0.0" y="-15.5" />
+      <point x="0.0" y="15.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="156.0" y="177.5" />
+  <SelectedNodes />
+  <Categories />
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

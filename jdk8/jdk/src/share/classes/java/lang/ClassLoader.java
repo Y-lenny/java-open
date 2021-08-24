@@ -403,13 +403,16 @@ public abstract class ClassLoader {
     {
         synchronized (getClassLoadingLock(name)) {
             // First, check if the class has already been loaded
+            // 首先，检查这个类是否已经被加载。
             Class<?> c = findLoadedClass(name);
             if (c == null) {
                 long t0 = System.nanoTime();
                 try {
+                    //父加载器不为空，调用父加载器loadClass()方法处理
                     if (parent != null) {
                         c = parent.loadClass(name, false);
                     } else {
+                        //父加载器为空，使用启动类加载器 BootstrapClassLoader 加载
                         c = findBootstrapClassOrNull(name);
                     }
                 } catch (ClassNotFoundException e) {
@@ -420,6 +423,7 @@ public abstract class ClassLoader {
                 if (c == null) {
                     // If still not found, then invoke findClass in order
                     // to find the class.
+                    // 假如一直找不到就尝试使用自己的加载器进行加载。
                     long t1 = System.nanoTime();
                     c = findClass(name);
 
@@ -515,7 +519,7 @@ public abstract class ClassLoader {
      * the {@link #loadClass <tt>loadClass</tt>} method after checking the
      * parent class loader for the requested class.  The default implementation
      * throws a <tt>ClassNotFoundException</tt>.
-     *
+     * 在不破坏双亲委派模型的情况下，通过重写{@link ClassLoader#findClass(String)}来实现。
      * @param  name
      *         The <a href="#name">binary name</a> of the class
      *

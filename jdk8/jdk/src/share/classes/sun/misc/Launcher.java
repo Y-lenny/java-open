@@ -50,8 +50,9 @@ import sun.security.util.SecurityConstants;
 import sun.net.www.ParseUtil;
 
 /**
- * This class is used by the system to launch the main application.
-Launcher */
+ * This class is used by the system to launch the main application. Launcher
+ * 这个类被用于系统启动主程序使。启动器
+ */
 public class Launcher {
     private static URLStreamHandlerFactory factory = new Factory();
     private static Launcher launcher = new Launcher();
@@ -66,6 +67,7 @@ public class Launcher {
 
     public Launcher() {
         // Create the extension class loader
+        // 创建 扩展类加载器
         ClassLoader extcl;
         try {
             extcl = ExtClassLoader.getExtClassLoader();
@@ -75,6 +77,7 @@ public class Launcher {
         }
 
         // Now create the class loader to use to launch the application
+        // 创建 应用类加载器，目的是为了启动应用程序。
         try {
             loader = AppClassLoader.getAppClassLoader(extcl);
         } catch (IOException e) {
@@ -83,6 +86,7 @@ public class Launcher {
         }
 
         // Also set the context class loader for the primordial thread.
+        // 给原始线程设置上下文线程。
         Thread.currentThread().setContextClassLoader(loader);
 
         // Finally, install a security manager if requested
@@ -128,6 +132,7 @@ public class Launcher {
         /**
          * create an ExtClassLoader. The ExtClassLoader is created
          * within a context that limits which files it can read
+         * 创建一个扩展类加载器。基于可访问文件目录构成的上下文中创建的。
          */
         public static ExtClassLoader getExtClassLoader() throws IOException
         {
@@ -167,6 +172,7 @@ public class Launcher {
         }
 
         private static File[] getExtDirs() {
+            // 扩展加载器加载 指定目录
             String s = System.getProperty("java.ext.dirs");
             File[] dirs;
             if (s != null) {
@@ -257,6 +263,7 @@ public class Launcher {
     /**
      * The class loader used for loading from java.class.path.
      * runs in a restricted security context.
+     *
      */
     static class AppClassLoader extends URLClassLoader {
 
@@ -267,6 +274,7 @@ public class Launcher {
         public static ClassLoader getAppClassLoader(final ClassLoader extcl)
             throws IOException
         {
+            // 加载java.class.path（应用classpath目录）下的所有jar包和类。
             final String s = System.getProperty("java.class.path");
             final File[] path = (s == null) ? new File[0] : getClassPath(s);
 
@@ -318,6 +326,7 @@ public class Launcher {
                 // Check if this class has already been defined dynamically;
                 // if so, return the loaded class; otherwise, skip the parent
                 // delegation and findClass.
+                // 这个类既不在父加载器里也不再本地URLClassPath目录下。检查这个类是否已经被动态定义了，假如是就返回这个加载的类否则跳过父类委托和查找。
                 Class<?> c = findLoadedClass(name);
                 if (c != null) {
                     if (resolve) {
