@@ -32,6 +32,8 @@ import java.util.function.Consumer;
  * interfaces.  Implements all optional list operations, and permits all
  * elements (including {@code null}).
  *
+ * 双端链表实现了{@link List} 和 {@link Deque}接口，实现了了所有list接口的方法并且允许存储所有类型值包括null。
+ *
  * <p>All of the operations perform as could be expected for a doubly-linked
  * list.  Operations that index into the list will traverse the list from
  * the beginning or the end, whichever is closer to the specified index.
@@ -136,6 +138,7 @@ public class LinkedList<E>
 
     /**
      * Links e as last element.
+     * 把添加的元素放入到链表尾部并且调整{@link #last}
      */
     void linkLast(E e) {
         final Node<E> l = last;
@@ -966,7 +969,7 @@ public class LinkedList<E>
                 throw new ConcurrentModificationException();
         }
     }
-
+    // 双向链表
     private static class Node<E> {
         E item;
         Node<E> next;

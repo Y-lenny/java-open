@@ -341,11 +341,13 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * to incorporate impact of the highest bits that would otherwise
      * never be used in index calculations because of table bounds.
      *
-     * Hash算法本质上就是三步：取key的hashCode值、高位运算、取模运算；此方法实现取值、高位，
-     * 其取模在具体使用方法中调用：hash&(length-1) 等同 hash%(length-1) 但效率更高相对mod运算
+     * 扰动函数：指的就是 HashMap 的 hash 方法。使用 hash 方法也就是扰动函数是为了防止一些实现比较差的 hashCode() 方法
+     * 换句话说使用扰动函数之后可以减少碰撞。
      */
     static final int hash(Object key) {
         int h;
+        // h = key.hashCode() 为第一步 取hashCode值
+        // h ^ (h >>> 16)  为第二步 高位参与运算（从速度、功效、质量来考虑的，这么做可以在数组table的length比较小的时候，也能保证考虑到高低Bit都参与到Hash的计算中，同时不会有太大的开销。）
         return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
     }
 
@@ -384,14 +386,13 @@ public class HashMap<K,V> extends AbstractMap<K,V>
 
     /**
      * Returns a power of two size for the given target capacity.
-     * 返回目标容量的两倍大小
+     * 返回大于输入参数且最近的2的整数次幂的数
+     * 参考链接：https://www.cnblogs.com/loading4/p/6239441.html
      */
     static final int tableSizeFor(int cap) {
+        // 为了找到的目标值大于或等于原值
         int n = cap - 1;
-        /**
-         * n = n | (n>>>1) ,相当于在右移位置设置为1；比如cap = 65，1000000 变成 1000001，... 1111111 + 1 相当于 cap 的2两倍(>>>:无符号右移，忽略符号位，空位都以0补齐)
-         * | & ^ ~ 运算符详情：https://www.cnblogs.com/ncznx/p/9163299.html
-         */
+        // 让最高位的1后面全部补1（确保是奇数），最后+1再变成偶数
         n |= n >>> 1;
         n |= n >>> 2;
         n |= n >>> 4;
@@ -434,7 +435,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * The next size value at which to resize (capacity * load factor).
      *
      * threshold = length * Load factor
-     *
+     * 阀值 = 数组长度 * 负载因子
      * @serial
      */
     // (The javadoc description is true upon serialization.
@@ -651,6 +652,9 @@ public class HashMap<K,V> extends AbstractMap<K,V>
             n = (tab = resize()).length;
         /**
          * ②.根据键值key计算hash值得到插入的数组索引i，如果table[i]==null，直接新建节点添加，转向⑥，如果table[i]不为空，转向③；
+         * hash & (n - 1) 等于 hash % (n-1)
+         * 通过h & (table.length -1)来得到该对象的保存位，而HashMap底层数组的长度总是2的n次方，这是HashMap在速度上的优化。
+         * 当length总是2的n次方时，h& (length-1)运算等价于对length取模，也就是h%length，但是&比%具有更高的效率。
          */
         if ((p = tab[i = (n - 1) & hash]) == null)
             tab[i] = newNode(hash, key, value, null);
@@ -717,13 +721,15 @@ public class HashMap<K,V> extends AbstractMap<K,V>
         int oldThr = threshold;
         int newCap, newThr = 0;
         if (oldCap > 0) {
+            // 超过最大值就不再扩充了，就只好随你碰撞去吧
             if (oldCap >= MAXIMUM_CAPACITY) {
                 threshold = Integer.MAX_VALUE;
                 return oldTab;
             }
+            // 没超过最大值，就扩充为原来的2倍
             else if ((newCap = oldCap << 1) < MAXIMUM_CAPACITY &&
                      oldCap >= DEFAULT_INITIAL_CAPACITY)
-                newThr = oldThr << 1; // double threshold
+                newThr = oldThr << 1; // double threshold 阀值相应扩充为原来的2倍
         }
         else if (oldThr > 0) // initial capacity was placed in threshold
             newCap = oldThr;
@@ -741,20 +747,25 @@ public class HashMap<K,V> extends AbstractMap<K,V>
             Node<K,V>[] newTab = (Node<K,V>[])new Node[newCap];
         table = newTab;
         if (oldTab != null) {
+            // 把每个bucket都移动到新的buckets中
             for (int j = 0; j < oldCap; ++j) {
                 Node<K,V> e;
                 if ((e = oldTab[j]) != null) {
                     oldTab[j] = null;
+                    // 1、当没有子节点/叶子节点时，移动到新的buckets中
                     if (e.next == null)
                         newTab[e.hash & (newCap - 1)] = e;
+                    // 2、当有叶子节点时，调整红黑树节点
                     else if (e instanceof TreeNode)
                         ((TreeNode<K,V>)e).split(this, newTab, j, oldCap);
+                    // 3、当有子节点时，调整链表节点
                     else { // preserve order
                         Node<K,V> loHead = null, loTail = null;
                         Node<K,V> hiHead = null, hiTail = null;
                         Node<K,V> next;
                         do {
                             next = e.next;
+                            // 3.1、当运算&新增高1位=0时，说明不需要调整元素位置
                             if ((e.hash & oldCap) == 0) {
                                 if (loTail == null)
                                     loHead = e;
@@ -762,6 +773,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
                                     loTail.next = e;
                                 loTail = e;
                             }
+                            // 3.2、否则需要调整元素位置
                             else {
                                 if (hiTail == null)
                                     hiHead = e;
@@ -770,10 +782,12 @@ public class HashMap<K,V> extends AbstractMap<K,V>
                                 hiTail = e;
                             }
                         } while ((e = next) != null);
+                        // 原索引放到bucket里
                         if (loTail != null) {
                             loTail.next = null;
                             newTab[j] = loHead;
                         }
+                        // 原索引+oldCap放到bucket里
                         if (hiTail != null) {
                             hiTail.next = null;
                             newTab[j + oldCap] = hiHead;
@@ -2149,7 +2163,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
          * Splits nodes in a tree bin into lower and upper tree bins,
          * or untreeifies if now too small. Called only from resize;
          * see above discussion about split bits and indices.
-         *
+         * 调整节点树至更低/高的红黑树，或者取消树化假如元素太小。
          * @param map the map
          * @param tab the table for recording bin heads
          * @param index the index of the table being split

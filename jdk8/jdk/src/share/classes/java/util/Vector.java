@@ -257,6 +257,8 @@ public class Vector<E>
     private void grow(int minCapacity) {
         // overflow-conscious code
         int oldCapacity = elementData.length;
+        // 扩容：如果指定了扩容容量的大小则扩容的新数组大小为原来的数组加上扩容容量的大小，如果不指定扩容容量的大小则扩容的新数组大小为原来数组大小的2倍。
+        // 这样扩容为原来的2倍是很消耗空间的，这也是Vector被弃用的原因之一。
         int newCapacity = oldCapacity + ((capacityIncrement > 0) ?
                                          capacityIncrement : oldCapacity);
         if (newCapacity - minCapacity < 0)

@@ -93,9 +93,11 @@ public class CopyOnWriteArrayList<E>
     private static final long serialVersionUID = 8673264195747942595L;
 
     /** The lock protecting all mutators */
+    // 保证DML线程安全
     final transient ReentrantLock lock = new ReentrantLock();
 
     /** The array, accessed only via getArray/setArray. */
+    // 保证数据可见性
     private transient volatile Object[] array;
 
     /**
@@ -426,7 +428,7 @@ public class CopyOnWriteArrayList<E>
 
     /**
      * Appends the specified element to the end of this list.
-     *
+     * 把指定元素放到list集合的最后
      * @param e element to be appended to this list
      * @return {@code true} (as specified by {@link Collection#add})
      */
@@ -436,9 +438,9 @@ public class CopyOnWriteArrayList<E>
         try {
             Object[] elements = getArray();
             int len = elements.length;
-            Object[] newElements = Arrays.copyOf(elements, len + 1); // 拷贝出新租住
-            newElements[len] = e; // 对元素组进行修改
-            setArray(newElements); // 替换数组引用
+            Object[] newElements = Arrays.copyOf(elements, len + 1); // 拷贝出新数组
+            newElements[len] = e; // 把元素放入到新数组中
+            setArray(newElements); // 替换原数组引用
             return true;
         } finally {
             lock.unlock();
