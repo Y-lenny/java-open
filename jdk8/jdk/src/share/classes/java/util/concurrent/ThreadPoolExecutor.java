@@ -399,7 +399,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
     private final AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
     //高3位表示线程状态，低29位表示活动线程数
     private static final int COUNT_BITS = Integer.SIZE - 3;
-    private static final int CAPACITY   = (1 << COUNT_BITS) - 1; //最大活动线程数: 00001111 11111111 11111111 11111111 = 2^(29) -1
+    private static final int CAPACITY   = (1 << COUNT_BITS) - 1; //最大活动线程数: 00011111 11111111 11111111 11111111 = 2^(29) -1
 
     // runState is stored in the high-order bits
     private static final int RUNNING    = -1 << COUNT_BITS; //     11100000 00000000 00000000 00000000
@@ -465,14 +465,13 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * expire.
      *
      * 这个队列用于容纳任务并且把任务交接给工作进程。通过workQueue.isEmpty()方法判断队列是否为空（所以我们必须通过这种方式来决定是否需要
-     * 进行状态由SHUTDOWN 到 TIDYING转变）。对于DelayQueues队列在任务时间还未到达时poll()方法也会返回空值即使有任务在等待。
+     * 进行状态由SHUTDOWN 到 TIDYING转变）。有个特殊需求的队列如{@link DelayQueue}调用poll()返回null即使延时到期可能会返回non-null值。
      *
-     * BlockingQueue主要有四种实现：
-     * 1、直接任务提交：${@link SynchronousQueue}队列，任务直接提交给工作线程，中间无缓冲区；maxPoolSize设置无界避免新任务提交无线程处理，此队列规避了任务之间存在依赖而产生锁关联？
-     * 2、无边界队列：${@link LinkedBlockingQueue}队列，任务进入缓冲区，适用于任务之间独立运行、突高并发量的任务请求？
-     * 3、有界队列：${@link ArrayBlockingQueue}队列，限定资源但不易调整队列大小，资源请求平整？
-     * ....
-     *
+     * BlockingQueue主要有四种实现： ？
+     * 1、同步队列：${@link SynchronousQueue}队列
+     * 2、链表队列：${@link LinkedBlockingQueue}队列
+     * 3、数组队列：${@link ArrayBlockingQueue}队列
+     * 4、延迟队列：${@link DelayQueue}队列
      */
     private final BlockingQueue<Runnable> workQueue;
 
@@ -1009,7 +1008,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * value to ensure reads of fresh values after checking other pool
      * state).
      * core参数意义：
-     *  true：表示在新增线程时会判断当前活动线程数是否少于corePoolSize，
+     *  true：新增线程前需要判断当前活动线程数是否少于corePoolSize，
      *  false：新增线程前需要判断当前活动线程数是否少于maximumPoolSize
      *
      * @return true if successful
@@ -1027,7 +1026,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
              * 这个条件代表着以下几个情景，就直接返回false说明线程创建失败：
              *  1.rs > SHUTDOWN； 此时不再接收新任务，且所有的任务已经执行完毕
              *  2.rs = SHUTDOWN； 此时不再接收新任务，但是会执行队列中的任务，firstTask != null成立
-             *  3.rs = SHUTDOWN；此时不再接收新任务，fistTask == null,任务队列workQueue已经空了
+             *  3.rs = SHUTDOWN； 此时不再接收新任务，fistTask == null,任务队列workQueue已经空了
              *
              */
             if (rs >= SHUTDOWN &&
@@ -1299,8 +1298,9 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
         boolean completedAbruptly = true;
         try {
             /**
+             * 线程复用方式：先执行worker的firstTask，执行完成再拉取queue中的任务。
              * 循环调用getTask()方法获取workQueue队列中的任务列表，直到返回null才终止
-             * 此处相当于进行一个线程去执行了多个任务 线程复用
+             * 此处相当于进行一个线程去执行了多个任务.
              */
             while (task != null || (task = getTask()) != null) {
                 w.lock();
