@@ -386,7 +386,7 @@ public abstract class AbstractQueuedSynchronizer
         // 标识节点当前在独占模式下
         static final Node EXCLUSIVE = null;
         /** waitStatus value to indicate thread has cancelled */
-        // 代码此线程取消了争抢这个锁
+        // 表示线程获取锁的请求已经取消了
         static final int CANCELLED =  1;
         /** waitStatus value to indicate successor's thread needs unparking */
         // 其表示当前node的后继节点对应的线程需要被唤醒
@@ -433,7 +433,7 @@ public abstract class AbstractQueuedSynchronizer
          * CONDITION for condition nodes.  It is modified using CAS
          * (or when possible, unconditional volatile writes).
          *
-         *
+         * 当前节点在队列中的状态
          */
         volatile int waitStatus;
 
@@ -490,6 +490,7 @@ public abstract class AbstractQueuedSynchronizer
          * we save a field by using special value to indicate shared
          * mode.
          *
+         * 指向下一个处于CONDITION状态的节点
          *
          */
         Node nextWaiter;
@@ -505,6 +506,8 @@ public abstract class AbstractQueuedSynchronizer
          * Returns previous node, or throws NullPointerException if null.
          * Use when predecessor cannot be null.  The null check could
          * be elided, but is present to help the VM.
+         *
+         * 返回前驱节点，没有的话抛出npe
          *
          * @return the predecessor of this node
          */
@@ -705,7 +708,7 @@ public abstract class AbstractQueuedSynchronizer
                     s = t;
         }
         if (s != null)
-            LockSupport.unpark(s.thread);//唤醒后继有效节点；被唤醒的线程又会从此行代码重新往后执行：LockSupport.unpark(this);
+            LockSupport.unpark(s.thread);//唤醒后继有效节点；被唤醒的线程又会从此行代码重新往后执行：LockSupport.park(this);
     }
 
     /**
