@@ -139,18 +139,18 @@ class ObjectMonitor {
   // are simple integers or pointers
   ObjectMonitor() {
     _header       = NULL;
-    _count        = 0;
+    _count        = 0;          // 记录个数
     _waiters      = 0,
     _recursions   = 0;
     _object       = NULL;
-    _owner        = NULL;
-    _WaitSet      = NULL;
+    _owner        = NULL;       // 拥有锁的线程
+    _WaitSet      = NULL;       // 处于wait状态的线程，会被加入到_WaitSet
     _WaitSetLock  = 0 ;
     _Responsible  = NULL ;
     _succ         = NULL ;
     _cxq          = NULL ;
     FreeNext      = NULL ;
-    _EntryList    = NULL ;
+    _EntryList    = NULL ;      // 处于等待锁block状态的线程，会被加入到该列表
     _SpinFreq     = 0 ;
     _SpinClock    = 0 ;
     OwnerIsThread = 0 ;
