@@ -553,6 +553,7 @@ public class Proxy implements java.io.Serializable {
     /**
      * A factory function that generates, defines and returns the proxy class given
      * the ClassLoader and array of interfaces.
+     * 工厂功能是生成，定义，并返回指定类加载器和接口列表的代理类。
      */
     private static final class ProxyClassFactory
         implements BiFunction<ClassLoader, Class<?>[], Class<?>>
@@ -571,6 +572,7 @@ public class Proxy implements java.io.Serializable {
                 /*
                  * Verify that the class loader resolves the name of this
                  * interface to the same Class object.
+                 * 验证这个接口在类加载器是否可以检索得到
                  */
                 Class<?> interfaceClass = null;
                 try {
@@ -584,6 +586,7 @@ public class Proxy implements java.io.Serializable {
                 /*
                  * Verify that the Class object actually represents an
                  * interface.
+                 * 验证是否是接口
                  */
                 if (!interfaceClass.isInterface()) {
                     throw new IllegalArgumentException(
@@ -591,6 +594,7 @@ public class Proxy implements java.io.Serializable {
                 }
                 /*
                  * Verify that this interface is not a duplicate.
+                 * 验证是否存在重复接口定义
                  */
                 if (interfaceSet.put(interfaceClass, Boolean.TRUE) != null) {
                     throw new IllegalArgumentException(
@@ -605,6 +609,7 @@ public class Proxy implements java.io.Serializable {
              * Record the package of a non-public proxy interface so that the
              * proxy class will be defined in the same package.  Verify that
              * all non-public proxy interfaces are in the same package.
+             * 验证 non-public 接口类型是否在同报名下
              */
             for (Class<?> intf : interfaces) {
                 int flags = intf.getModifiers();
@@ -635,6 +640,7 @@ public class Proxy implements java.io.Serializable {
 
             /*
              * Generate the specified proxy class.
+             * 生成特定的代理类
              */
             byte[] proxyClassFile = ProxyGenerator.generateProxyClass(
                 proxyName, interfaces, accessFlags);
@@ -731,6 +737,7 @@ public class Proxy implements java.io.Serializable {
 
         /*
          * Look up or generate the designated proxy class.
+         * 查询或者生成被设计的代理对象。
          */
         Class<?> cl = getProxyClass0(loader, intfs);
 
@@ -742,6 +749,7 @@ public class Proxy implements java.io.Serializable {
                 checkNewProxyPermission(Reflection.getCallerClass(), cl);
             }
 
+            // 使用代理对象的有参[{@link InvocationHandler}]构造函数进行代理对象创建。（说明设计的代理对象字节码中包含了InvocationHandler字段）
             final Constructor<?> cons = cl.getConstructor(constructorParams);
             final InvocationHandler ih = h;
             if (!Modifier.isPublic(cl.getModifiers())) {
