@@ -3,16 +3,16 @@
   <ID>JAVA</ID>
   <OriginalElement>java.util.concurrent.locks.AbstractQueuedSynchronizer</OriginalElement>
   <nodes>
-    <node x="15.657894736842081" y="2017.0">java.util.concurrent.locks.ReentrantLock.FairSync</node>
     <node x="717.5894736842105" y="214.0">java.util.concurrent.locks.AbstractQueuedSynchronizer</node>
+    <node x="15.657894736842081" y="2017.0">java.util.concurrent.locks.ReentrantLock.FairSync</node>
     <node x="1925.3394736842106" y="0.0">java.util.concurrent.CyclicBarrier</node>
     <node x="0.0" y="632.0">java.util.concurrent.locks.ReentrantLock</node>
     <node x="1532.782894736842" y="643.0">java.util.concurrent.Semaphore</node>
     <node x="233.33947368421047" y="1649.0">java.util.concurrent.locks.ReentrantLock.Sync</node>
     <node x="1021.5894736842105" y="1561.0">java.util.concurrent.locks.AbstractQueuedSynchronizer.ConditionObject</node>
     <node x="441.74999999999994" y="786.0">java.util.concurrent.CountDownLatch</node>
-    <node x="55.5" y="0.0">java.util.concurrent.locks.Lock</node>
     <node x="523.3394736842105" y="1715.0">java.util.concurrent.CountDownLatch.Sync</node>
+    <node x="55.5" y="0.0">java.util.concurrent.locks.Lock</node>
     <node x="1460.3394736842106" y="2028.0">java.util.concurrent.Semaphore.FairSync</node>
     <node x="830.5894736842105" y="1726.0">java.util.concurrent.locks.AbstractQueuedSynchronizer.Node</node>
     <node x="1962.8394736842106" y="281.0">java.util.concurrent.CyclicBarrier.Generation</node>
@@ -134,12 +134,14 @@
       <point x="100.0" y="214.5" />
     </edge>
   </edges>
-  <settings layout="Hierarchic Group" zoom="1.0" x="479.0" y="356.5" />
-  <SelectedNodes />
+  <settings layout="Hierarchic Group" zoom="0.34311405584477045" x="1064.5" y="1046.5" />
+  <SelectedNodes>
+    <node>java.util.concurrent.locks.AbstractQueuedSynchronizer</node>
+  </SelectedNodes>
   <Categories>
+    <Category>Methods</Category>
     <Category>Properties</Category>
     <Category>Inner Classes</Category>
-    <Category>Methods</Category>
   </Categories>
   <SCOPE>All</SCOPE>
   <VISIBILITY>private</VISIBILITY>
