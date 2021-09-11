@@ -82,7 +82,7 @@ Java_java_net_SocketOutputStream_socketWrite0(JNIEnv *env, jobject this,
         }
 
     }
-
+    //1、申请一块直接内存bufP, 长度为len
     if (len <= MAX_BUFFER_LEN) {
         bufP = BUF;
         buflen = MAX_BUFFER_LEN;
@@ -101,9 +101,11 @@ Java_java_net_SocketOutputStream_socketWrite0(JNIEnv *env, jobject this,
         int loff = 0;
         int chunkLen = min(buflen, len);
         int llen = chunkLen;
+        // 2、将堆内的data复制到刚才初始化的内存bufP里
         (*env)->GetByteArrayRegion(env, data, off, chunkLen, (jbyte *)bufP);
 
         while(llen > 0) {
+            // 3、调用Net_send函数发送数据（Net_send是一个宏，定义在net_util_md.h-79 里）
             int n = NET_Send(fd, bufP + loff, llen, 0);
             if (n > 0) {
                 llen -= n;

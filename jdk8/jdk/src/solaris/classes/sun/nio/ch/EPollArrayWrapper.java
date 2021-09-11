@@ -84,6 +84,7 @@ class EPollArrayWrapper {
         new GetIntegerAction("sun.nio.ch.maxUpdateArraySize", Math.min(OPEN_MAX, 64*1024)));
 
     // The fd of the epoll driver
+    // epoll驱动对应的文件描述符
     private final int epfd;
 
      // The epoll_event array for results from epoll_wait
@@ -117,7 +118,9 @@ class EPollArrayWrapper {
     // by file descriptor and stored as bytes for efficiency reasons. For
     // file descriptors higher than MAX_UPDATE_ARRAY_SIZE (unlimited case at
     // least) then the update is stored in a map.
+    // 使用数组保存事件变更, 数组的最大长度是MAX_UPDATE_ARRAY_SIZE, 最大64*1024
     private final byte[] eventsLow = new byte[MAX_UPDATE_ARRAY_SIZE];
+    // 超过数组长度的事件会缓存到这个map中，等待下次处理
     private Map<Integer,Byte> eventsHigh;
 
     // Used by release and updateRegistrations to track whether a file
@@ -127,6 +130,7 @@ class EPollArrayWrapper {
 
     EPollArrayWrapper() throws IOException {
         // creates the epoll file descriptor
+        // 创建epoll fd
         epfd = epollCreate();
 
         // the epoll_event array passed to epoll_wait
@@ -181,6 +185,7 @@ class EPollArrayWrapper {
      * unless {@code force} is {@code true}.
      */
     private void setUpdateEvents(int fd, byte events, boolean force) {
+        // 判断fd和数组长度
         if (fd < MAX_UPDATE_ARRAY_SIZE) {
             if ((eventsLow[fd] != KILLED) || force) {
                 eventsLow[fd] = events;
@@ -266,6 +271,7 @@ class EPollArrayWrapper {
 
     int poll(long timeout) throws IOException {
         updateRegistrations();
+        // 这个epollWait是不是有点熟悉呢？
         updated = epollWait(pollArrayAddress, NUM_EPOLLEVENTS, timeout, epfd);
         for (int i=0; i<updated; i++) {
             if (getDescriptor(i) == incomingInterruptFD) {
@@ -279,23 +285,28 @@ class EPollArrayWrapper {
 
     /**
      * Update the pending registrations.
+     * 更新待处理的注册事件
      */
     private void updateRegistrations() {
         synchronized (updateLock) {
             int j = 0;
             while (j < updateCount) {
                 int fd = updateDescriptors[j];
+                // 从保存的eventsLow和eventsHigh里取出事件
                 short events = getUpdateEvents(fd);
                 boolean isRegistered = registered.get(fd);
                 int opcode = 0;
 
                 if (events != KILLED) {
+                    // 判断操作类型以传给epoll_ctl
+                    // 没有指定EPOLLET事件类型
                     if (isRegistered) {
                         opcode = (events != 0) ? EPOLL_CTL_MOD : EPOLL_CTL_DEL;
                     } else {
                         opcode = (events != 0) ? EPOLL_CTL_ADD : 0;
                     }
                     if (opcode != 0) {
+                        // 熟悉的epoll_ctl
                         epollCtl(epfd, opcode, fd, events);
                         if (opcode == EPOLL_CTL_ADD) {
                             registered.set(fd);

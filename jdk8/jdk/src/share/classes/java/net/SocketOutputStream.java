@@ -106,6 +106,7 @@ class SocketOutputStream extends FileOutputStream
 
         FileDescriptor fd = impl.acquireFD();
         try {
+            // 上面就是做了一些参数判断，然后委托给socketWrite0
             socketWrite0(fd, b, off, len);
         } catch (SocketException se) {
             if (se instanceof sun.net.ConnectionResetException) {
@@ -129,6 +130,7 @@ class SocketOutputStream extends FileOutputStream
      */
     public void write(int b) throws IOException {
         temp[0] = (byte)b;
+        // 委托给本类的socketWrite方法
         socketWrite(temp, 0, 1);
     }
 

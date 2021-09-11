@@ -616,7 +616,7 @@ class Bits {                            // package-private
 
 
     // -- Direct memory management --
-
+    // -- 直接内存管理 --
     // A user-settable upper limit on the maximum amount of allocatable
     // direct buffer memory.  This value may be changed during VM
     // initialization if it is launched with "-XX:MaxDirectMemorySize=<size>".
@@ -638,6 +638,7 @@ class Bits {                            // package-private
             // -XX:MaxDirectMemorySize limits the total capacity rather than the
             // actual memory usage, which will differ when buffers are page
             // aligned.
+            // 判断内存够不够， 够的话直接增加内存引用的计数
             if (cap <= maxMemory - totalCapacity) {
                 reservedMemory += size;
                 totalCapacity += cap;
@@ -646,14 +647,17 @@ class Bits {                            // package-private
             }
         }
 
+        // 内存不够就去建议JVM gc了。。
         System.gc();
         try {
+            // 等待垃圾回收
             Thread.sleep(100);
         } catch (InterruptedException x) {
             // Restore interrupt status
             Thread.currentThread().interrupt();
         }
         synchronized (Bits.class) {
+            // 增加直接内存的计数，假如gc完还不够那就抛出异常
             if (totalCapacity + cap > maxMemory)
                 throw new OutOfMemoryError("Direct buffer memory");
             reservedMemory += size;

@@ -152,7 +152,8 @@ class FileDispatcherImpl extends FileDispatcher {
     }
 
     //-- Native methods
-
+    // 这个是文件IO函数，第一个参数传入socket fd的时候，将会从socket的读缓冲区复制数据到目标地址;
+    // 这里不细讲,感兴趣可以看看这篇文章(https://blog.csdn.net/zongcai249/article/details/17598411)
     static native int read0(FileDescriptor fd, long address, int len)
         throws IOException;
 

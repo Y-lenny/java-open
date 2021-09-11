@@ -579,7 +579,7 @@ public class FileChannelImpl
             Util.releaseTemporaryDirectBuffer(bb);
         }
     }
-
+    // 将本Channel的文件字节转移到指定的可写Channel
     public long transferTo(long position, long count,
                            WritableByteChannel target)
         throws IOException
@@ -604,10 +604,12 @@ public class FileChannelImpl
         long n;
 
         // Attempt a direct transfer, if the kernel supports it
+        // 尝试直接传输（如果内核支持）
         if ((n = transferToDirectly(position, icount, target)) >= 0)
             return n;
 
         // Attempt a mapped transfer, but only to trusted channel types
+        // 尝试映射传输，但仅限于受信任的通道类型
         if ((n = transferToTrustedChannel(position, icount, target)) >= 0)
             return n;
 
@@ -852,6 +854,7 @@ public class FileChannelImpl
     private static final int MAP_RW = 1;
     private static final int MAP_PV = 2;
 
+    // 将文件的一部分映射到内存
     public MappedByteBuffer map(MapMode mode, long position, long size)
         throws IOException
     {
@@ -922,17 +925,22 @@ public class FileChannelImpl
             long mapSize = size + pagePosition;
             try {
                 // If no exception was thrown from map0, the address is valid
+                // 假如map0方法没有异常抛出，说明这个这个地址是有效的
+                // 调用map0这个native方法
                 addr = map0(imode, mapPosition, mapSize);
             } catch (OutOfMemoryError x) {
                 // An OutOfMemoryError may indicate that we've exhausted memory
                 // so force gc and re-attempt map
+                // gc下防止内存不够
                 System.gc();
                 try {
+                    // 等待gc结束
                     Thread.sleep(100);
                 } catch (InterruptedException y) {
                     Thread.currentThread().interrupt();
                 }
                 try {
+                    // 再试一次
                     addr = map0(imode, mapPosition, mapSize);
                 } catch (OutOfMemoryError y) {
                     // After a second OOME, fail

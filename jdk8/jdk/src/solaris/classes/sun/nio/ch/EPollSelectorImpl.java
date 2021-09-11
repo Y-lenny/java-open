@@ -59,29 +59,37 @@ class EPollSelectorImpl
     /**
      * Package private constructor called by factory method in
      * the abstract superclass Selector.
+     * 1、Epoll fd的创建
      */
     EPollSelectorImpl(SelectorProvider sp) throws IOException {
         super(sp);
+        // makePipe返回管道的2个文件描述符，编码在一个long类型的变量中
+        // 高32位代表读 低32位代表写
+        // 使用pipe为了实现Selector的wakeup逻辑
         long pipeFds = IOUtil.makePipe(false);
         fd0 = (int) (pipeFds >>> 32);
         fd1 = (int) pipeFds;
+        // 新建一个EPollArrayWrapper
         pollWrapper = new EPollArrayWrapper();
         pollWrapper.initInterrupt(fd0, fd1);
         fdToKey = new HashMap<>();
     }
 
+    // 2、Epoll wait等待内核IO事件
     protected int doSelect(long timeout) throws IOException {
         if (closed)
             throw new ClosedSelectorException();
         processDeregisterQueue();
         try {
             begin();
+            // 真正的实现是这行
             pollWrapper.poll(timeout);
         } finally {
             end();
         }
         processDeregisterQueue();
         int numKeysUpdated = updateSelectedKeys();
+        // 以下基本都是异常处理
         if (pollWrapper.interrupted()) {
             // Clear the wakeup pipe
             pollWrapper.putEventOps(pollWrapper.interruptedIndex(), 0);

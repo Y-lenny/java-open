@@ -3833,14 +3833,13 @@ JVM_LEAF(jint, JVM_SocketShutdown(jint fd, jint howto))
   return os::socket_shutdown(fd, howto);
 JVM_END
 
-
 JVM_LEAF(jint, JVM_Recv(jint fd, char *buf, jint nBytes, jint flags))
   JVMWrapper2("JVM_Recv (0x%x)", fd);
   //%note jvm_r6
   return os::recv(fd, buf, (size_t)nBytes, (uint)flags);
 JVM_END
 
-
+// 调用os::send，见：os_linux.inline.hpp-183
 JVM_LEAF(jint, JVM_Send(jint fd, char *buf, jint nBytes, jint flags))
   JVMWrapper2("JVM_Send (0x%x)", fd);
   //%note jvm_r6

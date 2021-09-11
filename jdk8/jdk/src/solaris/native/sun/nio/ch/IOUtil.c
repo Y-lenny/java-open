@@ -69,6 +69,7 @@ Java_sun_nio_ch_IOUtil_setfdVal(JNIEnv *env, jclass clazz, jobject fdo, jint val
 static int
 configureBlocking(int fd, jboolean blocking)
 {
+    // 所以还是靠file control设置阻塞模式（阻塞/非阻塞）
     int flags = fcntl(fd, F_GETFL);
     int newflags = blocking ? (flags & ~O_NONBLOCK) : (flags | O_NONBLOCK);
 

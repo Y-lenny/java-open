@@ -92,7 +92,7 @@ Java_sun_nio_ch_FileChannelImpl_map0(JNIEnv *env, jobject this,
         protections =  PROT_WRITE | PROT_READ;
         flags = MAP_PRIVATE;
     }
-
+    // 所以还是使用的mmap这个API
     mapAddress = mmap64(
         0,                    /* Let OS decide location */
         len,                  /* Number of bytes to map */
@@ -163,6 +163,7 @@ Java_sun_nio_ch_FileChannelImpl_transferTo0(JNIEnv *env, jobject this,
 
 #if defined(__linux__)
     off64_t offset = (off64_t)position;
+    // 调用sendfile方法
     jlong n = sendfile64(dstFD, srcFD, &offset, (size_t)count);
     if (n < 0) {
         if (errno == EAGAIN)

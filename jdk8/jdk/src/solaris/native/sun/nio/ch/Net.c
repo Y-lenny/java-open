@@ -240,7 +240,7 @@ Java_sun_nio_ch_Net_socket0(JNIEnv *env, jclass cl, jboolean preferIPv6,
 #else
     int domain = AF_INET;
 #endif
-
+    // 老朋友socket函数
     fd = socket(domain, type, 0);
     if (fd < 0) {
         return handleSocketError(env, errno);
@@ -261,6 +261,10 @@ Java_sun_nio_ch_Net_socket0(JNIEnv *env, jclass cl, jboolean preferIPv6,
     }
 #endif
 
+    // 设置是否重用地址，如果打开的是ServerSocketChannel
+    // 默认是重用的，其他普通SocketChannel默认不重用
+    // 重用和不重用的区别在于，就算你关掉了程序，你绑定的
+    // 本地端口也在一定时间内是已使用的(address already in use)
     if (reuse) {
         int arg = 1;
         if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (char*)&arg,

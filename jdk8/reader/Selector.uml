@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>java.nio.channels.Selector</OriginalElement>
+  <nodes>
+    <node x="683.0" y="395.0">sun.nio.ch.DevPollSelectorImpl</node>
+    <node x="621.25" y="158.0">java.nio.channels.Selector</node>
+    <node x="605.75" y="316.0">sun.nio.ch.SelectorImpl</node>
+    <node x="598.75" y="0.0">java.lang.AutoCloseable</node>
+    <node x="590.25" y="237.0">java.nio.channels.spi.AbstractSelector</node>
+    <node x="483.0" y="395.0">sun.nio.ch.EPollSelectorImpl</node>
+    <node x="0.0" y="395.0">sun.nio.ch.AbstractPollSelectorImpl</node>
+    <node x="31.0" y="474.0">sun.nio.ch.PollSelectorImpl</node>
+    <node x="253.0" y="395.0">sun.nio.ch.WindowsSelectorImpl</node>
+    <node x="615.75" y="79.0">java.io.Closeable</node>
+    <node x="902.0" y="395.0">sun.nio.ch.EventPortSelectorImpl</node>
+    <node x="1137.0" y="395.0">sun.nio.ch.KQueueSelectorImpl</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="java.io.Closeable" target="java.lang.AutoCloseable" relationship="INTERFACE_GENERALIZATION">
+      <point x="0.0" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="java.nio.channels.spi.AbstractSelector" target="java.nio.channels.Selector" relationship="GENERALIZATION">
+      <point x="0.0" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="sun.nio.ch.AbstractPollSelectorImpl" target="sun.nio.ch.SelectorImpl" relationship="GENERALIZATION">
+      <point x="0.0" y="-14.5" />
+      <point x="116.5" y="370.0" />
+      <point x="677.75" y="370.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="sun.nio.ch.KQueueSelectorImpl" target="sun.nio.ch.SelectorImpl" relationship="GENERALIZATION">
+      <point x="0.0" y="-14.5" />
+      <point x="1237.5" y="370.0" />
+      <point x="677.75" y="370.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="sun.nio.ch.EPollSelectorImpl" target="sun.nio.ch.SelectorImpl" relationship="GENERALIZATION">
+      <point x="0.0" y="-14.5" />
+      <point x="573.0" y="370.0" />
+      <point x="677.75" y="370.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="sun.nio.ch.DevPollSelectorImpl" target="sun.nio.ch.SelectorImpl" relationship="GENERALIZATION">
+      <point x="0.0" y="-14.5" />
+      <point x="782.5" y="370.0" />
+      <point x="677.75" y="370.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="sun.nio.ch.WindowsSelectorImpl" target="sun.nio.ch.SelectorImpl" relationship="GENERALIZATION">
+      <point x="0.0" y="-14.5" />
+      <point x="358.0" y="370.0" />
+      <point x="677.75" y="370.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="java.nio.channels.Selector" target="java.io.Closeable" relationship="REALIZATION">
+      <point x="0.0" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="sun.nio.ch.SelectorImpl" target="java.nio.channels.spi.AbstractSelector" relationship="GENERALIZATION">
+      <point x="0.0" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="sun.nio.ch.PollSelectorImpl" target="sun.nio.ch.AbstractPollSelectorImpl" relationship="GENERALIZATION">
+      <point x="0.0" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="sun.nio.ch.EventPortSelectorImpl" target="sun.nio.ch.SelectorImpl" relationship="GENERALIZATION">
+      <point x="0.0" y="-14.5" />
+      <point x="1009.5" y="370.0" />
+      <point x="677.75" y="370.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic" zoom="0.8997399241653915" showDependencies="false" x="378.7726541157008" y="389.70458033237935" />
+  <SelectedNodes>
+    <node>java.nio.channels.Selector</node>
+  </SelectedNodes>
+  <Categories />
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

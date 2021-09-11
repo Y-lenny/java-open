@@ -275,7 +275,7 @@ public abstract class AbstractSelectableChannel
 
     /**
      * Adjusts this channel's blocking mode.
-     *
+     * 设置当前SocketChannel是否是阻塞的，和selector一起用的时候一定要设置成非阻塞才有意义, 阻塞的话就不需要IO多路复用的事件通知了。
      * <p> If the given blocking mode is different from the current blocking
      * mode then this method invokes the {@link #implConfigureBlocking
      * implConfigureBlocking} method, while holding the appropriate locks, in
@@ -291,6 +291,7 @@ public abstract class AbstractSelectableChannel
                 return this;
             if (block && haveValidKeys())
                 throw new IllegalBlockingModeException();
+            // 模板方法模式，调用子类的实现阻塞模式设置
             implConfigureBlocking(block);
             blocking = block;
         }

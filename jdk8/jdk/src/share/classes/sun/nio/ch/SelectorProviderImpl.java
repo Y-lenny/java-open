@@ -57,6 +57,7 @@ public abstract class SelectorProviderImpl
     }
 
     public SocketChannel openSocketChannel() throws IOException {
+        // 调用SocketChannelImpl的构造器
         return new SocketChannelImpl(this);
     }
 }

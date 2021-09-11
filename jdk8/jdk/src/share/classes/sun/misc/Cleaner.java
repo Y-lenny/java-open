@@ -32,7 +32,7 @@ import java.security.PrivilegedAction;
 
 /**
  * General-purpose phantom-reference-based cleaners.
- *
+ * 基于虚引用的清理者类
  * <p> Cleaners are a lightweight and more robust alternative to finalization.
  * They are lightweight because they are not created by the VM and thus do not
  * require a JNI upcall to be created, and because their cleanup code is
@@ -63,12 +63,12 @@ public class Cleaner
     // Dummy reference queue, needed because the PhantomReference constructor
     // insists that we pass a queue.  Nothing will ever be placed on this queue
     // since the reference handler invokes cleaners explicitly.
-    //
+    // 在JVM中，虚引用是为了实现更细粒度的内存控制的手段，在创建虚引用的时候必须传入一个引用队列(ReferenceQueue)，
+    // 在一个对象的finalize函数被调用之后，这个对象的虚引用会被加入引用队列, 通过检查队列就可以知道对象是不是要被回收了。
     private static final ReferenceQueue<Object> dummyQueue = new ReferenceQueue<>();
 
     // Doubly-linked list of live cleaners, which prevents the cleaners
     // themselves from being GC'd before their referents
-    //
     static private Cleaner first = null;
 
     private Cleaner
@@ -118,7 +118,7 @@ public class Cleaner
 
     /**
      * Creates a new cleaner.
-     *
+     * 创建一个清理者
      * @param  ob the referent object to be cleaned
      * @param  thunk
      *         The cleanup code to be run when the cleaner is invoked.  The

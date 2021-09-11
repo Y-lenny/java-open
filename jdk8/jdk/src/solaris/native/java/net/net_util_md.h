@@ -75,6 +75,7 @@ extern int NET_Poll(struct pollfd *ufds, unsigned int nfds, int timeout);
 #define NET_Read        JVM_Read
 #define NET_RecvFrom    JVM_RecvFrom
 #define NET_ReadV       readv
+// 这个宏替换的是JVM_Send,是一个cpp封装方法 见： jvm.cpp-3844
 #define NET_Send        JVM_Send
 #define NET_SendTo      JVM_SendTo
 #define NET_WriteV      writev

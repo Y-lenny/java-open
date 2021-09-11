@@ -47,7 +47,9 @@ public abstract class SelectorImpl
     protected HashSet<SelectionKey> keys;
 
     // Public views of the key sets
+    // 注册的所有事件
     private Set<SelectionKey> publicKeys;             // Immutable
+    // 内核返回的IO事件封装，表示哪些fd有数据可读可写
     private Set<SelectionKey> publicSelectedKeys;     // Removal allowed, but not addition
 
     protected SelectorImpl(SelectorProvider sp) {
@@ -120,6 +122,7 @@ public abstract class SelectorImpl
 
     public void putEventOps(SelectionKeyImpl sk, int ops) { }
 
+    // 3、epoll control以及openjdk对事件管理的封装
     protected final SelectionKey register(AbstractSelectableChannel ch,
                                           int ops,
                                           Object attachment)

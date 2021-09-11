@@ -188,10 +188,13 @@ public class IOUtil {
     {
         if (dst.isReadOnly())
             throw new IllegalArgumentException("Read-only buffer");
+        // 判断是不是DirectBuffer，是直接读进去
+        // DirectBuffer是有名的冰山对象，其后可能关联着一堆直接内存
         if (dst instanceof DirectBuffer)
             return readIntoNativeBuffer(fd, dst, position, nd);
 
         // Substitute a native buffer
+        // 如果传入的不是DirectBuffer,那么使用临时的DirectBuffer
         ByteBuffer bb = Util.getTemporaryDirectBuffer(dst.remaining());
         try {
             int n = readIntoNativeBuffer(fd, bb, position, nd);
@@ -204,6 +207,8 @@ public class IOUtil {
         }
     }
 
+    // 在JVM里是有GC的，但在调用Socket Api进行读写通信的时候，需传入的是一个固定的内存地址，
+    // 假如数据使用的是堆内地址，GC之后对象地址就变了，这时socket读写就会崩。
     private static int readIntoNativeBuffer(FileDescriptor fd, ByteBuffer bb,
                                             long position, NativeDispatcher nd)
         throws IOException
@@ -216,6 +221,10 @@ public class IOUtil {
         if (rem == 0)
             return 0;
         int n = 0;
+        // 调用本地方法去读
+        // 要读socket fd一定要知道起始地址
+        // 感兴趣可以看看https://stackoverflow.com/questions/11981474/pread-and-lseek-not-working-on-socket-file-descriptor
+        // 调用完毕bb的那个DirectBuffer的直接内存里就有数据了
         if (position != -1) {
             n = nd.pread(fd, ((DirectBuffer)bb).address() + pos,
                          rem, position);

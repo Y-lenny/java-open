@@ -102,8 +102,12 @@ class SocketChannelImpl
     //
     SocketChannelImpl(SelectorProvider sp) throws IOException {
         super(sp);
+        // 创建socket fd
         this.fd = Net.socket(true);
+        // 获取socket fd的值
         this.fdVal = IOUtil.fdVal(fd);
+        // 初始化SocketChannel状态, 状态不多，总共就6个
+        // 未初始化，未连接，正在连接，已连接，断开连接中，已断开
         this.state = ST_UNCONNECTED;
     }
 
@@ -299,6 +303,7 @@ class SocketChannelImpl
         synchronized (readLock) {
             if (!ensureReadOpen())
                 return -1;
+            // n表示读到的数据长度
             int n = 0;
             try {
 
@@ -377,6 +382,7 @@ class SocketChannelImpl
                 // except that the shutdown operation plays the role of
                 // nd.preClose().
                 for (;;) {
+                    // 从socket fd里读数据，长度由buf决定
                     n = IOUtil.read(fd, buf, -1, nd);
                     if ((n == IOStatus.INTERRUPTED) && isOpen()) {
                         // The system call was interrupted but the channel
@@ -468,6 +474,7 @@ class SocketChannelImpl
                     writerThread = NativeThread.current();
                 }
                 for (;;) {
+                    // 写数据到socket fd中
                     n = IOUtil.write(fd, buf, -1, nd);
                     if ((n == IOStatus.INTERRUPTED) && isOpen())
                         continue;

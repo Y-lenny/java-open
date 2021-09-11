@@ -60,8 +60,10 @@ public class DefaultSelectorProvider {
      * Returns the default SelectorProvider.
      */
     public static SelectorProvider create() {
+        // 获取系统名称
         String osname = AccessController
             .doPrivileged(new GetPropertyAction("os.name"));
+        // 根据名称来创建不同的Selctor
         if (osname.equals("SunOS"))
             return createProvider("sun.nio.ch.DevPollSelectorProvider");
         if (osname.equals("Linux"))

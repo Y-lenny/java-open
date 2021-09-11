@@ -172,6 +172,7 @@ public abstract class SelectorProvider {
                                 return provider;
                             if (loadProviderAsService())
                                 return provider;
+                            // 这里就是打开Selector的真正方法
                             provider = sun.nio.ch.DefaultSelectorProvider.create();
                             return provider;
                         }

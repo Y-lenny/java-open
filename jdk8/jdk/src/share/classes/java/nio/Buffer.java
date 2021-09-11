@@ -188,6 +188,7 @@ public abstract class Buffer {
     private int capacity;
 
     // Used only by direct buffers
+    // 仅由直接缓冲区使用
     // NOTE: hoisted here for speed in JNI GetDirectBufferAddress
     long address;
 

@@ -179,6 +179,7 @@ inline int os::recv(int fd, char* buf, size_t nBytes, uint flags) {
   RESTARTABLE_RETURN_INT(::recv(fd, buf, nBytes, flags));
 }
 
+// 最后会调用os::send,这个在os_linux.inline.hpp里，可以看到，最后调用的是一个全局函数send
 inline int os::send(int fd, char* buf, size_t nBytes, uint flags) {
   RESTARTABLE_RETURN_INT(::send(fd, buf, nBytes, flags));
 }

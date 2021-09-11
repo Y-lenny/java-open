@@ -408,6 +408,7 @@ public class Net {
         throws IOException {
         boolean preferIPv6 = isIPv6Available() &&
             (family != StandardProtocolFamily.INET);
+        // 最后调用的是socket0
         return IOUtil.newFD(socket0(preferIPv6, stream, false, fastLoopback));
     }
 

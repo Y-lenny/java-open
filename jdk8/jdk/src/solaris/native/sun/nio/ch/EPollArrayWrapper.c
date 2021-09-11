@@ -82,6 +82,9 @@ Java_sun_nio_ch_EPollArrayWrapper_epollCreate(JNIEnv *env, jobject this)
     /*
      * epoll_create expects a size as a hint to the kernel about how to
      * dimension internal structures. We can't predict the size in advance.
+     *
+     * 这里的size可以不指定，从Linux2.6.8之后，改用了红黑树结构，指定了大小也没啥用
+     * epoll_create 操作系统API
      */
     int epfd = epoll_create(256);
     if (epfd < 0) {
@@ -111,7 +114,7 @@ Java_sun_nio_ch_EPollArrayWrapper_epollCtl(JNIEnv *env, jobject this, jint epfd,
 
     event.events = events;
     event.data.fd = fd;
-
+    // 发起epoll_ctl调用来进行IO事件的管理
     RESTARTABLE(epoll_ctl(epfd, (int)opcode, (int)fd, &event), res);
 
     /*
@@ -138,6 +141,7 @@ Java_sun_nio_ch_EPollArrayWrapper_epollWait(JNIEnv *env, jobject this,
     int res;
 
     if (timeout <= 0) {           /* Indefinite or no wait */
+        // 发起epoll_wait系统调用等待内核事件
         RESTARTABLE(epoll_wait(epfd, events, numfds, timeout), res);
     } else {                      /* Bounded wait; bounded restarts */
         res = iepoll(epfd, events, numfds, timeout);
