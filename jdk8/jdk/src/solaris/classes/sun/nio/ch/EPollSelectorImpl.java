@@ -44,9 +44,11 @@ class EPollSelectorImpl
     protected int fd1;
 
     // The poll object
+    // poll/epoll 对象
     EPollArrayWrapper pollWrapper;
 
     // Maps from file descriptors to keys
+    // k：文件描述符 v：SelectionKey map集合
     private Map<Integer,SelectionKeyImpl> fdToKey;
 
     // True if this Selector has been closed
@@ -105,6 +107,7 @@ class EPollSelectorImpl
     /**
      * Update the keys whose fd's have been selected by the epoll.
      * Add the ready keys to the ready queue.
+     * 更新已经被epoll选中的文件描述符的keys，并且加入到准备队列中。
      */
     private int updateSelectedKeys() {
         int entries = pollWrapper.updated;

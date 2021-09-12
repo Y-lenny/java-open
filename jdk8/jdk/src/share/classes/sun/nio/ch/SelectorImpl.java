@@ -41,9 +41,11 @@ public abstract class SelectorImpl
 {
 
     // The set of keys with data ready for an operation
+    // 数据已经准备就绪等待操作的事件
     protected Set<SelectionKey> selectedKeys;
 
     // The set of keys registered with this Selector
+    // 已经注册在该Selector上的事件
     protected HashSet<SelectionKey> keys;
 
     // Public views of the key sets

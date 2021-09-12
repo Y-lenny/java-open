@@ -235,6 +235,7 @@ class EPollArrayWrapper {
 
     /**
      * Add a file descriptor
+     * 增加一个文件描述符
      */
     void add(int fd) {
         // force the initial update events to 0 as it may be KILLED by a

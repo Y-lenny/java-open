@@ -7,8 +7,8 @@
     <node x="476.39285714285717" y="1905.0">java.util.Vector</node>
     <node x="395.39285714285717" y="1050.0">java.util.AbstractList</node>
     <node x="0.0" y="1938.0">java.util.LinkedList</node>
-    <node x="48.39285714285717" y="698.0">java.util.concurrent.CopyOnWriteArrayList</node>
     <node x="799.3928571428571" y="2037.0">java.util.ArrayList</node>
+    <node x="48.39285714285717" y="698.0">java.util.concurrent.CopyOnWriteArrayList</node>
   </nodes>
   <notes />
   <edges>
@@ -63,7 +63,7 @@
       <point x="0.0" y="225.5" />
     </edge>
   </edges>
-  <settings layout="Hierarchic Group" zoom="0.22117144600366076" x="567.0" y="1629.0" />
+  <settings layout="Hierarchic Group" zoom="0.1464307504575961" x="567.0" y="1629.0" />
   <SelectedNodes>
     <node>java.util.List</node>
   </SelectedNodes>
