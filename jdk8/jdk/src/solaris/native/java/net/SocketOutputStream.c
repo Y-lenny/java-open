@@ -82,7 +82,7 @@ Java_java_net_SocketOutputStream_socketWrite0(JNIEnv *env, jobject this,
         }
 
     }
-    //1、申请一块直接内存bufP, 长度为len
+    //1、申请一块直接内存bufP, 长度为len；但没有合理管理
     if (len <= MAX_BUFFER_LEN) {
         bufP = BUF;
         buflen = MAX_BUFFER_LEN;
