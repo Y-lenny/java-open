@@ -891,7 +891,7 @@ JVM_ENTRY(jclass, JVM_FindClassFromClassLoader(JNIEnv* env, const char* name,
   }
   return result;
 JVM_END
-
+// 从指定的加载器查找该类
 // Find a class with this name in this loader, using the caller's protection domain.
 JVM_ENTRY(jclass, JVM_FindClassFromCaller(JNIEnv* env, const char* name,
                                           jboolean init, jobject loader,
@@ -903,9 +903,10 @@ JVM_ENTRY(jclass, JVM_FindClassFromCaller(JNIEnv* env, const char* name,
     // into the constant pool.
     THROW_MSG_0(vmSymbols::java_lang_ClassNotFoundException(), name);
   }
-
+  // 把当前类加入符号表（一个哈希表实现）
   TempNewSymbol h_name = SymbolTable::new_symbol(name, CHECK_NULL);
 
+  // 获取加载器和调用类
   oop loader_oop = JNIHandles::resolve(loader);
   oop from_class = JNIHandles::resolve(caller);
   oop protection_domain = NULL;
@@ -920,12 +921,13 @@ JVM_ENTRY(jclass, JVM_FindClassFromCaller(JNIEnv* env, const char* name,
 
   Handle h_loader(THREAD, loader_oop);
   Handle h_prot(THREAD, protection_domain);
+  // 查找该类,find_class_from_class_loader位于/src/hotspot/share/prims/jvm.cpp-4099
   jclass result = find_class_from_class_loader(env, h_name, init, h_loader,
                                                h_prot, false, THREAD);
 
   if (TraceClassResolution && result != NULL) {
     trace_class_resolution(java_lang_Class::as_Klass(JNIHandles::resolve_non_null(result)));
-  }
+  }// 返回结果
   return result;
 JVM_END
 
@@ -4093,7 +4095,7 @@ void initialize_converter_functions() {
 
 
 // Shared JNI/JVM entry points //////////////////////////////////////////////////////////////
-
+// 从指定的classloader中查找类
 jclass find_class_from_class_loader(JNIEnv* env, Symbol* name, jboolean init,
                                     Handle loader, Handle protection_domain,
                                     jboolean throwError, TRAPS) {
@@ -4103,6 +4105,12 @@ jclass find_class_from_class_loader(JNIEnv* env, Symbol* name, jboolean init,
   //   the checkPackageAccess relative to the initiating class loader via the
   //   protection_domain. The protection_domain is passed as NULL by the java code
   //   if there is no security manager in 3-arg Class.forName().
+  //==========================================
+  //
+  // 根据指定的类名和加载器返回一个Klass对象，必要情况下需要加载该类。
+  // 如果未找到该类则抛出NoClassDefFoundError或ClassNotFoundException
+  // resolve_or_fail 位于src/hotspot/share/classfile/systemDictionary.cpp-178
+  //=========================================
   Klass* klass = SystemDictionary::resolve_or_fail(name, loader, protection_domain, throwError != 0, CHECK_NULL);
 
   KlassHandle klass_handle(THREAD, klass);

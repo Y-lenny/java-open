@@ -91,7 +91,7 @@ Java_java_lang_Class_registerNatives(JNIEnv *env, jclass cls)
     (*env)->RegisterNatives(env, cls, methods,
                             sizeof(methods)/sizeof(JNINativeMethod));
 }
-
+// 动态装载类型入口
 JNIEXPORT jclass JNICALL
 Java_java_lang_Class_forName0(JNIEnv *env, jclass this, jstring classname,
                               jboolean initialize, jobject loader, jclass caller)
@@ -119,19 +119,20 @@ Java_java_lang_Class_forName0(JNIEnv *env, jclass this, jstring classname,
         clname = buf;
     }
     (*env)->GetStringUTFRegion(env, classname, 0, unicode_len, clname);
-
+        // 把类全限定名里的'.'翻译成'/'
     if (VerifyFixClassname(clname) == JNI_TRUE) {
         /* slashes present in clname, use name b4 translation for exception */
         (*env)->GetStringUTFRegion(env, classname, 0, unicode_len, clname);
         JNU_ThrowClassNotFoundException(env, clname);
         goto done;
     }
-
+    // 验证类全限定名名合法性（是否以'/'分隔）
     if (!VerifyClassname(clname, JNI_TRUE)) {  /* expects slashed name */
         JNU_ThrowClassNotFoundException(env, clname);
         goto done;
     }
 
+    // 从指定的加载器查找该类，FindClassFromCaller位于src/hotspot/share/prims/jvm.cpp-894
     cls = JVM_FindClassFromCaller(env, clname, initialize, loader, caller);
 
  done:

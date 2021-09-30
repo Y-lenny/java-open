@@ -231,6 +231,9 @@ public final class Class<T> implements java.io.Serializable,
      * interface with the given string name.  Invoking this method is
      * equivalent to:
      *
+     * Class.forName 引起的线程block现象（线上问题）：
+     * 因为这个方法在执行名称查找类字节码时进行上锁，所以在并发量比较大的时候这种block才比较明显：https://zhuanlan.zhihu.com/p/339238355
+     * 源码分析路径：forName0 -> JVM_FindClassFromCaller -> find_class_from_class_loader -> resolve_or_fail -> resolve_or_null -> resolve_instance_class_or_null -> load_instance_class
      * <blockquote>
      *  {@code Class.forName(className, true, currentLoader)}
      * </blockquote>
