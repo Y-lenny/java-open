@@ -11,8 +11,8 @@
     <node x="233.33947368421047" y="1649.0">java.util.concurrent.locks.ReentrantLock.Sync</node>
     <node x="1021.5894736842105" y="1561.0">java.util.concurrent.locks.AbstractQueuedSynchronizer.ConditionObject</node>
     <node x="441.74999999999994" y="786.0">java.util.concurrent.CountDownLatch</node>
-    <node x="55.5" y="0.0">java.util.concurrent.locks.Lock</node>
     <node x="523.3394736842105" y="1715.0">java.util.concurrent.CountDownLatch.Sync</node>
+    <node x="55.5" y="0.0">java.util.concurrent.locks.Lock</node>
     <node x="1460.3394736842106" y="2028.0">java.util.concurrent.Semaphore.FairSync</node>
     <node x="830.5894736842105" y="1726.0">java.util.concurrent.locks.AbstractQueuedSynchronizer.Node</node>
     <node x="1962.8394736842106" y="281.0">java.util.concurrent.CyclicBarrier.Generation</node>
@@ -63,12 +63,6 @@
       <point x="1463.5894736842106" y="1997.0" />
       <point x="-61.0" y="71.0" />
     </edge>
-    <edge source="java.util.concurrent.locks.ReentrantLock.Sync" target="java.util.concurrent.locks.AbstractQueuedSynchronizer">
-      <point x="67.5" y="-115.0" />
-      <point x="435.8394736842105" y="1531.0" />
-      <point x="757.2894736842105" y="1531.0" />
-      <point x="-158.79999999999995" y="643.5" />
-    </edge>
     <edge source="java.util.concurrent.Semaphore.FairSync" target="java.util.concurrent.Semaphore">
       <point x="50.0" y="-27.0" />
       <point x="1610.3394736842106" y="1997.0" />
@@ -76,6 +70,12 @@
       <point x="1657.0894736842106" y="1541.0" />
       <point x="1682.782894736842" y="1541.0" />
       <point x="0.0" y="214.5" />
+    </edge>
+    <edge source="java.util.concurrent.locks.ReentrantLock.Sync" target="java.util.concurrent.locks.AbstractQueuedSynchronizer">
+      <point x="67.5" y="-115.0" />
+      <point x="435.8394736842105" y="1531.0" />
+      <point x="757.2894736842105" y="1531.0" />
+      <point x="-158.79999999999995" y="643.5" />
     </edge>
     <edge source="java.util.concurrent.locks.ReentrantLock.FairSync" target="java.util.concurrent.locks.ReentrantLock">
       <point x="-47.75" y="-38.0" />
@@ -89,15 +89,15 @@
       <point x="995.4894736842105" y="1541.0" />
       <point x="79.39999999999998" y="643.5" />
     </edge>
-    <edge source="java.util.concurrent.locks.ReentrantLock" target="java.util.concurrent.locks.Lock">
-      <point x="0.0" y="-225.5" />
-      <point x="0.0" y="82.0" />
-    </edge>
     <edge source="java.util.concurrent.CountDownLatch.Sync" target="java.util.concurrent.locks.AbstractQueuedSynchronizer">
       <point x="58.25" y="-49.0" />
       <point x="698.0894736842105" y="1541.0" />
       <point x="836.6894736842105" y="1541.0" />
       <point x="-79.39999999999998" y="643.5" />
+    </edge>
+    <edge source="java.util.concurrent.locks.ReentrantLock" target="java.util.concurrent.locks.Lock">
+      <point x="0.0" y="-225.5" />
+      <point x="0.0" y="82.0" />
     </edge>
     <edge source="java.util.concurrent.CountDownLatch.Sync" target="java.util.concurrent.CountDownLatch">
       <point x="-58.25" y="-49.0" />
@@ -134,7 +134,7 @@
       <point x="100.0" y="214.5" />
     </edge>
   </edges>
-  <settings layout="Hierarchic Group" zoom="0.22335970218706372" x="1064.5000000000002" y="1046.5" />
+  <settings layout="Hierarchic Group" zoom="0.3541666666666667" x="1064.5" y="1046.0" />
   <SelectedNodes>
     <node>java.util.concurrent.locks.AbstractQueuedSynchronizer</node>
   </SelectedNodes>

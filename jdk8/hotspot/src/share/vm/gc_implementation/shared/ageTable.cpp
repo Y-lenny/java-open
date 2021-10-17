@@ -77,22 +77,25 @@ void ageTable::merge_par(ageTable* subTable) {
     Atomic::add_ptr(subTable->sizes[i], &sizes[i]);
   }
 }
-
+// 动态晋升年龄阈值计算
+// survivor_capacity survivor容量大小
 uint ageTable::compute_tenuring_threshold(size_t survivor_capacity) {
+  // TargetSurvivorRatio(-XX:TargetSurvivorRatio 默认50%) survivor容量使用比率，用于计算基于年龄内存占用的统计阀值。
   size_t desired_survivor_size = (size_t)((((double) survivor_capacity)*TargetSurvivorRatio)/100);
   size_t total = 0;
   uint age = 1;
   assert(sizes[0] == 0, "no objects with age zero should be recorded");
   while (age < table_size) {
-    total += sizes[age];
+    total += sizes[age];// 累加已使用内存
     // check if including objects of age 'age' made us pass the desired
     // size, if so 'age' is the new threshold
+    // 已使用内存统计达到了阀值就停止统计
     if (total > desired_survivor_size) break;
     age++;
-  }
-  uint result = age < MaxTenuringThreshold ? age : MaxTenuringThreshold;
+  }// MaxTenuringThreshold(-XX:MaxTenuringThreshold 默认15)
+  uint result = age < MaxTenuringThreshold ? age : MaxTenuringThreshold;// 取统计的阀值年龄与默认值中的最小的
 
-  if (PrintTenuringDistribution || UsePerfData) {
+  if (PrintTenuringDistribution || UsePerfData) {// PrintTenuringDistribution(-XX:+PrintTenuringDistribution) 来打印出当次GC后的年龄阀值和默认阀值。
 
     if (PrintTenuringDistribution) {
       gclog_or_tty->cr();

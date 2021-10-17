@@ -3,83 +3,53 @@
   <ID>JAVA</ID>
   <OriginalElement>java.nio.channels.Selector</OriginalElement>
   <nodes>
-    <node x="1139.0" y="395.0">sun.nio.ch.DevPollSelectorImpl</node>
-    <node x="0.0" y="548.0">java.nio.channels.SelectionKey</node>
-    <node x="625.25" y="158.0">java.nio.channels.Selector</node>
-    <node x="609.75" y="316.0">sun.nio.ch.SelectorImpl</node>
-    <node x="602.75" y="0.0">java.lang.AutoCloseable</node>
-    <node x="594.25" y="237.0">java.nio.channels.spi.AbstractSelector</node>
-    <node x="483.0" y="395.0">sun.nio.ch.EPollSelectorImpl</node>
+    <node x="150.0" y="237.0">java.nio.channels.spi.AbstractSelector</node>
     <node x="0.0" y="395.0">sun.nio.ch.AbstractPollSelectorImpl</node>
-    <node x="31.0" y="474.0">sun.nio.ch.PollSelectorImpl</node>
-    <node x="253.0" y="395.0">sun.nio.ch.WindowsSelectorImpl</node>
-    <node x="619.75" y="79.0">java.io.Closeable</node>
-    <node x="683.0" y="395.0">sun.nio.ch.EventPortSelectorImpl</node>
-    <node x="918.0" y="395.0">sun.nio.ch.KQueueSelectorImpl</node>
+    <node x="0.0" y="548.0">java.nio.channels.SelectionKey</node>
+    <node x="32.0" y="474.0">sun.nio.ch.PollSelectorImpl</node>
+    <node x="178.0" y="79.0">java.io.Closeable</node>
+    <node x="182.0" y="158.0">java.nio.channels.Selector</node>
+    <node x="166.0" y="316.0">sun.nio.ch.SelectorImpl</node>
+    <node x="162.0" y="0.0">java.lang.AutoCloseable</node>
+    <node x="260.0" y="395.0">sun.nio.ch.KQueueSelectorImpl</node>
   </nodes>
   <notes />
   <edges>
-    <edge source="java.io.Closeable" target="java.lang.AutoCloseable" relationship="INTERFACE_GENERALIZATION">
+    <edge source="sun.nio.ch.SelectorImpl" target="java.nio.channels.spi.AbstractSelector">
       <point x="0.0" y="-14.5" />
       <point x="0.0" y="14.5" />
     </edge>
-    <edge source="java.nio.channels.spi.AbstractSelector" target="java.nio.channels.Selector" relationship="GENERALIZATION">
+    <edge source="java.nio.channels.Selector" target="java.io.Closeable">
       <point x="0.0" y="-14.5" />
       <point x="0.0" y="14.5" />
     </edge>
-    <edge source="sun.nio.ch.AbstractPollSelectorImpl" target="sun.nio.ch.SelectorImpl" relationship="GENERALIZATION">
-      <point x="0.0" y="-14.5" />
-      <point x="116.5" y="370.0" />
-      <point x="681.75" y="370.0" />
-      <point x="0.0" y="14.5" />
-    </edge>
-    <edge source="sun.nio.ch.KQueueSelectorImpl" target="sun.nio.ch.SelectorImpl" relationship="GENERALIZATION">
-      <point x="0.0" y="-14.5" />
-      <point x="1018.5" y="370.0" />
-      <point x="681.75" y="370.0" />
-      <point x="0.0" y="14.5" />
-    </edge>
-    <edge source="sun.nio.ch.DevPollSelectorImpl" target="sun.nio.ch.SelectorImpl" relationship="GENERALIZATION">
-      <point x="0.0" y="-14.5" />
-      <point x="1238.5" y="370.0" />
-      <point x="681.75" y="370.0" />
-      <point x="0.0" y="14.5" />
-    </edge>
-    <edge source="sun.nio.ch.EPollSelectorImpl" target="sun.nio.ch.SelectorImpl" relationship="GENERALIZATION">
-      <point x="0.0" y="-14.5" />
-      <point x="573.0" y="370.0" />
-      <point x="681.75" y="370.0" />
-      <point x="0.0" y="14.5" />
-    </edge>
-    <edge source="sun.nio.ch.WindowsSelectorImpl" target="sun.nio.ch.SelectorImpl" relationship="GENERALIZATION">
-      <point x="0.0" y="-14.5" />
-      <point x="358.0" y="370.0" />
-      <point x="681.75" y="370.0" />
-      <point x="0.0" y="14.5" />
-    </edge>
-    <edge source="sun.nio.ch.SelectorImpl" target="java.nio.channels.spi.AbstractSelector" relationship="GENERALIZATION">
+    <edge source="sun.nio.ch.PollSelectorImpl" target="sun.nio.ch.AbstractPollSelectorImpl">
       <point x="0.0" y="-14.5" />
       <point x="0.0" y="14.5" />
     </edge>
-    <edge source="java.nio.channels.Selector" target="java.io.Closeable" relationship="REALIZATION">
+    <edge source="java.nio.channels.spi.AbstractSelector" target="java.nio.channels.Selector">
       <point x="0.0" y="-14.5" />
       <point x="0.0" y="14.5" />
     </edge>
-    <edge source="sun.nio.ch.PollSelectorImpl" target="sun.nio.ch.AbstractPollSelectorImpl" relationship="GENERALIZATION">
+    <edge source="java.io.Closeable" target="java.lang.AutoCloseable">
       <point x="0.0" y="-14.5" />
       <point x="0.0" y="14.5" />
     </edge>
-    <edge source="sun.nio.ch.EventPortSelectorImpl" target="sun.nio.ch.SelectorImpl" relationship="GENERALIZATION">
+    <edge source="sun.nio.ch.KQueueSelectorImpl" target="sun.nio.ch.SelectorImpl">
       <point x="0.0" y="-14.5" />
-      <point x="790.5" y="370.0" />
-      <point x="681.75" y="370.0" />
-      <point x="0.0" y="14.5" />
+      <point x="356.0" y="370.0" />
+      <point x="274.0" y="370.0" />
+      <point x="36.0" y="14.5" />
+    </edge>
+    <edge source="sun.nio.ch.AbstractPollSelectorImpl" target="sun.nio.ch.SelectorImpl">
+      <point x="0.0" y="-14.5" />
+      <point x="120.0" y="370.0" />
+      <point x="202.0" y="370.0" />
+      <point x="-36.0" y="14.5" />
     </edge>
   </edges>
-  <settings layout="Hierarchic" zoom="1.0" showDependencies="false" x="669.0" y="288.5" />
-  <SelectedNodes>
-    <node>java.nio.channels.SelectionKey</node>
-  </SelectedNodes>
+  <settings layout="Hierarchic Group" zoom="1.0" x="226.0" y="288.5" />
+  <SelectedNodes />
   <Categories />
   <SCOPE>All</SCOPE>
   <VISIBILITY>private</VISIBILITY>

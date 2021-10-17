@@ -193,7 +193,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * 5:    0.00015795
      * 6:    0.00001316
      * 7:    0.00000094
-     * 8:    0.00000006
+     * 8:    0.00000006 // 柏森分布（概率学）
      * more: less than 1 in ten million
      *
      * The root of a tree bin is normally its first node.  However,

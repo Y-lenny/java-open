@@ -9,19 +9,13 @@
   </nodes>
   <notes />
   <edges>
-    <edge source="java.util.concurrent.ScheduledThreadPoolExecutor" target="java.util.concurrent.ThreadPoolExecutor" relationship="GENERALIZATION">
+    <edge source="java.util.concurrent.ScheduledThreadPoolExecutor" target="java.util.concurrent.ThreadPoolExecutor">
       <point x="-69.0" y="-14.5" />
       <point x="86.25" y="136.0" />
       <point x="100.0" y="136.0" />
       <point x="0.0" y="14.5" />
     </edge>
-    <edge source="java.util.concurrent.ThreadPoolExecutor" target="java.util.concurrent.ExecutorService" relationship="REALIZATION">
-      <point x="0.0" y="-14.5" />
-      <point x="100.0" y="55.0" />
-      <point x="155.25" y="55.0" />
-      <point x="0.0" y="14.5" />
-    </edge>
-    <edge source="java.util.concurrent.ScheduledThreadPoolExecutor" target="java.util.concurrent.ExecutorService" relationship="REALIZATION">
+    <edge source="java.util.concurrent.ScheduledThreadPoolExecutor" target="java.util.concurrent.ExecutorService">
       <point x="69.0" y="-14.5" />
       <point x="224.25" y="136.0" />
       <point x="210.5" y="136.0" />
@@ -29,8 +23,14 @@
       <point x="155.25" y="55.0" />
       <point x="0.0" y="14.5" />
     </edge>
+    <edge source="java.util.concurrent.ThreadPoolExecutor" target="java.util.concurrent.ExecutorService">
+      <point x="0.0" y="-14.5" />
+      <point x="100.0" y="55.0" />
+      <point x="155.25" y="55.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
   </edges>
-  <settings layout="Hierarchic" zoom="1.0" showDependencies="false" x="147.0" y="96.0" />
+  <settings layout="Hierarchic Group" zoom="1.0" x="141.0" y="95.5" />
   <SelectedNodes>
     <node>java.util.concurrent.ExecutorService</node>
   </SelectedNodes>
