@@ -3,8 +3,8 @@
   <ID>JAVA</ID>
   <OriginalElement>java.nio.channels.Channel</OriginalElement>
   <nodes>
-    <node x="622.1654929577464" y="332.0">java.nio.channels.ScatteringByteChannel</node>
     <node x="757.625" y="249.0">java.nio.channels.ReadableByteChannel</node>
+    <node x="622.1654929577464" y="332.0">java.nio.channels.ScatteringByteChannel</node>
     <node x="298.5404929577465" y="513.0">java.nio.channels.DatagramChannel</node>
     <node x="620.6461267605633" y="0.0">java.lang.AutoCloseable</node>
     <node x="0.0" y="513.0">java.nio.channels.ServerSocketChannel</node>
@@ -112,20 +112,20 @@
       <point x="946.6654929577464" y="392.0" />
       <point x="0.0" y="14.5" />
     </edge>
-    <edge source="java.nio.channels.DatagramChannel" target="java.nio.channels.GatheringByteChannel">
-      <point x="45.5" y="-14.5" />
-      <point x="435.0404929577465" y="482.0" />
-      <point x="946.6654929577464" y="482.0" />
-      <point x="946.6654929577464" y="462.0" />
-      <point x="1160.9154929577464" y="462.0" />
-      <point x="0.0" y="14.5" />
-    </edge>
     <edge source="java.nio.channels.FileChannel" target="java.nio.channels.GatheringByteChannel">
       <point x="0.0" y="-14.5" />
       <point x="731.6654929577464" y="492.0" />
       <point x="600.6232394366197" y="492.0" />
       <point x="600.6232394366197" y="452.0" />
       <point x="1160.9154929577464" y="452.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="java.nio.channels.DatagramChannel" target="java.nio.channels.GatheringByteChannel">
+      <point x="45.5" y="-14.5" />
+      <point x="435.0404929577465" y="482.0" />
+      <point x="946.6654929577464" y="482.0" />
+      <point x="946.6654929577464" y="462.0" />
+      <point x="1160.9154929577464" y="462.0" />
       <point x="0.0" y="14.5" />
     </edge>
     <edge source="java.nio.channels.SocketChannel" target="java.nio.channels.SelectableChannel">
@@ -233,8 +233,10 @@
       <point x="0.0" y="14.5" />
     </edge>
   </edges>
-  <settings layout="Hierarchic Group" zoom="0.751954513148543" x="693.5" y="271.0" />
-  <SelectedNodes />
+  <settings layout="Hierarchic Group" zoom="0.7604832977967306" x="693.5" y="271.0" />
+  <SelectedNodes>
+    <node>java.nio.channels.Channel</node>
+  </SelectedNodes>
   <Categories />
   <SCOPE>All</SCOPE>
   <VISIBILITY>private</VISIBILITY>
