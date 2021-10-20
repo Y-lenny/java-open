@@ -1067,7 +1067,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
         boolean workerAdded = false;
         Worker w = null;
         try {
-            // 创建工作进程
+            // 创建工作线程
             w = new Worker(firstTask);
             final Thread t = w.thread;
             if (t != null) {
