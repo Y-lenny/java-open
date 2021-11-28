@@ -138,17 +138,17 @@ class ObjectMonitor {
   // initialize the monitor, exception the semaphore, all other fields
   // are simple integers or pointers
   ObjectMonitor() {
-    _header       = NULL;
+    _header       = NULL;wakee
     _count        = 0;          // 记录个数
     _waiters      = 0,
-    _recursions   = 0;
-    _object       = NULL;
-    _owner        = NULL;       // 拥有锁的线程
+    _recursions   = 0;          // 线程重入次数
+    _object       = NULL;       // 拥有monitor锁的对象
+    _owner        = NULL;       // 拥有monitor锁的线程
     _WaitSet      = NULL;       // 处于wait状态的线程，会被加入到_WaitSet
     _WaitSetLock  = 0 ;
     _Responsible  = NULL ;
-    _succ         = NULL ;
-    _cxq          = NULL ;
+    _succ         = NULL ;      //
+    _cxq          = NULL ;      // 多线程竞争锁时的单向队列（所有新访问的线程会加入此队列，假如满足条件会再进入_EntryList列表）
     FreeNext      = NULL ;
     _EntryList    = NULL ;      // 处于等待锁block状态的线程，会被加入到该列表
     _SpinFreq     = 0 ;

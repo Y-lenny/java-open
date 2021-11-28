@@ -233,7 +233,7 @@ IRT_ENTRY(void, InterpreterRuntime::quicken_io_cc(JavaThread* thread))
   ConstantPool* cpool = method(thread)->constants();
   // We'd expect to assert that we're only here to quicken bytecodes, but in a multithreaded
   // program we might have seen an unquick'd bytecode in the interpreter but have another
-  // thread quicken the bytecode before we get here.
+  // thread quicken the bytecomonitorenterde before we get here.
   // assert( cpool->tag_at(which).is_unresolved_klass(), "should only come here to quicken bytecodes" );
   Klass* klass = cpool->klass_at(which, CHECK);
   thread->set_vm_result_2(klass);
@@ -596,7 +596,7 @@ IRT_END
 
 
 //------------------------------------------------------------------------------------------------------------------------
-// Synchronization
+// Synchronization 同步
 //
 // The interpreter's synchronization code is factored out so that it can
 // be shared by method invocation and synchronized blocks.
@@ -613,10 +613,10 @@ IRT_ENTRY_NO_ASYNC(void, InterpreterRuntime::monitorenter(JavaThread* thread, Ba
   Handle h_obj(thread, elem->obj());
   assert(Universe::heap()->is_in_reserved_or_null(h_obj()),
          "must be NULL or an object");
-  if (UseBiasedLocking) {
+  if (UseBiasedLocking) {// 使用偏向锁
     // Retry fast entry if bias is revoked to avoid unnecessary inflation
     ObjectSynchronizer::fast_enter(h_obj, elem->lock(), true, CHECK);
-  } else {
+  } else {// 使用重量锁：见objectMonitor.cpp l-317
     ObjectSynchronizer::slow_enter(h_obj, elem->lock(), CHECK);
   }
   assert(Universe::heap()->is_in_reserved_or_null(elem->obj()),
