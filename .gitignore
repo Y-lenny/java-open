@@ -12,3 +12,5 @@ build
 .hg
 jdk8/out
 /out/
+*.DS_Store
+jdk8/.DS_Store
