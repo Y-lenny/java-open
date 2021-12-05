@@ -36,7 +36,7 @@ import sun.reflect.Reflection;
  * A collection of methods for performing low-level, unsafe operations.
  * Although the class and all methods are public, use of this class is
  * limited because only trusted code can obtain instances of it.
- * unsafe类里都是静态native方法，其实就是堆大家常用的各种free,malloc这样的内存操作函数的封装，因为java不能操作直接内存。
+ * unsafe类里都是静态native方法，其实就是对大家常用的各种free,malloc这样的内存操作函数的封装，因为java不能操作直接内存。
  * @author John R. Rose
  * @see #getUnsafe
  */
@@ -880,7 +880,9 @@ public final class Unsafe {
     /**
      * Atomically update Java variable to <tt>x</tt> if it is currently
      * holding <tt>expected</tt>.
+     * 假如当前内存值(offset地址对应的值)与期望值e相等则进行原子更新操作为x
      * @return <tt>true</tt> if successful
+     * unsafe方法都是原生方法，对应底层是通过C++实现的；这个方法的C++实现见：unsafe.cpp-Unsafe_CompareAndSwapInt-1228L
      */
     public final native boolean compareAndSwapInt(Object o, long offset,
                                                   int expected,

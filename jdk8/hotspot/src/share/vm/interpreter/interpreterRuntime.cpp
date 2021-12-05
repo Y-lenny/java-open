@@ -596,13 +596,13 @@ IRT_END
 
 
 //------------------------------------------------------------------------------------------------------------------------
-// Synchronization 同步
+// Synchronization 同步切面（前置判断是否使用偏向锁-可配置参数）
 //
 // The interpreter's synchronization code is factored out so that it can
 // be shared by method invocation and synchronized blocks.
 //%note synchronization_3
 
-//%note monitor_1
+//%note monitor_1  monitorenter入口
 IRT_ENTRY_NO_ASYNC(void, InterpreterRuntime::monitorenter(JavaThread* thread, BasicObjectLock* elem))
 #ifdef ASSERT
   thread->last_frame().interpreter_frame_verify_monitor(elem);
@@ -613,10 +613,10 @@ IRT_ENTRY_NO_ASYNC(void, InterpreterRuntime::monitorenter(JavaThread* thread, Ba
   Handle h_obj(thread, elem->obj());
   assert(Universe::heap()->is_in_reserved_or_null(h_obj()),
          "must be NULL or an object");
-  if (UseBiasedLocking) {// 使用偏向锁
+  if (UseBiasedLocking) {// 判断偏向锁是否打开
     // Retry fast entry if bias is revoked to avoid unnecessary inflation
-    ObjectSynchronizer::fast_enter(h_obj, elem->lock(), true, CHECK);
-  } else {// 使用重量锁：见objectMonitor.cpp l-317
+    ObjectSynchronizer::fast_enter(h_obj, elem->lock(), true, CHECK);// 偏向锁入口
+  } else {// 轻量锁入口
     ObjectSynchronizer::slow_enter(h_obj, elem->lock(), CHECK);
   }
   assert(Universe::heap()->is_in_reserved_or_null(elem->obj()),
@@ -627,7 +627,7 @@ IRT_ENTRY_NO_ASYNC(void, InterpreterRuntime::monitorenter(JavaThread* thread, Ba
 IRT_END
 
 
-//%note monitor_1
+//%note monitor_1 monitorexit出口
 IRT_ENTRY_NO_ASYNC(void, InterpreterRuntime::monitorexit(JavaThread* thread, BasicObjectLock* elem))
 #ifdef ASSERT
   thread->last_frame().interpreter_frame_verify_monitor(elem);

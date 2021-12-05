@@ -41,32 +41,59 @@
 #endif
 
 #include "runtime/atomic.inline.hpp"
-
+// exchange_value 需要被交换的值
+// dest 当前值地址
+// compare_value 期望值
 jbyte Atomic::cmpxchg(jbyte exchange_value, volatile jbyte* dest, jbyte compare_value) {
   assert(sizeof(jbyte) == 1, "assumption.");
   uintptr_t dest_addr = (uintptr_t)dest;
   uintptr_t offset = dest_addr % sizeof(jint);
-  volatile jint* dest_int = (volatile jint*)(dest_addr - offset);
-  jint cur = *dest_int;
+  volatile jint* dest_int = (volatile jint*)(dest_addr - offset); // 当前值
+  jint cur = *dest_int;// 当前值
   jbyte* cur_as_bytes = (jbyte*)(&cur);
-  jint new_val = cur;
+  jint new_val = cur;// 新值
   jbyte* new_val_as_bytes = (jbyte*)(&new_val);
   new_val_as_bytes[offset] = exchange_value;
-  while (cur_as_bytes[offset] == compare_value) {
-    jint res = cmpxchg(new_val, dest_int, cur);
-    if (res == cur) break;
-    cur = res;
+  while (cur_as_bytes[offset] == compare_value) { // 比较当前值和期望值是否相等
+    jint res = cmpxchg(new_val, dest_int, cur);// 进行交换
+    if (res == cur) break;// 交换失败了直接break
+    cur = res;// 交换成功进行变量修改为新值
     new_val = cur;
     new_val_as_bytes[offset] = exchange_value;
   }
-  return cur_as_bytes[offset];
+  return cur_as_bytes[offset]; // 返回当前值
 }
 
 unsigned Atomic::xchg(unsigned int exchange_value, volatile unsigned int* dest) {
   assert(sizeof(unsigned int) == sizeof(jint), "more work to do");
   return (unsigned int)Atomic::xchg((jint)exchange_value, (volatile jint*)dest);
 }
-
+/*
+ * 根据操作系统类型调用不同平台下的重载函数，这个在预编译期间编译器会决定调用哪个平台下的重载
+ * 函数。相关的预编译逻辑如下：
+ *
+ * atomic.inline.hpp：
+ *    #include "runtime/atomic.hpp"
+ *
+ *    // Linux
+ *    #ifdef TARGET_OS_ARCH_linux_x86
+ *    # include "atomic_linux_x86.inline.hpp"
+ *    #endif
+ *
+ *    // 省略部分代码
+ *
+ *    // Windows
+ *    #ifdef TARGET_OS_ARCH_windows_x86
+ *    # include "atomic_windows_x86.inline.hpp"
+ *    #endif
+ *
+ *    // BSD
+ *    #ifdef TARGET_OS_ARCH_bsd_x86
+ *    # include "atomic_bsd_x86.inline.hpp"
+ *    #endif
+ *
+ * 接下来分析 atomic_windows_x86.inline.hpp 中的 cmpxchg 函数实现
+ */
 unsigned Atomic::cmpxchg(unsigned int exchange_value,
                          volatile unsigned int* dest, unsigned int compare_value) {
   assert(sizeof(unsigned int) == sizeof(jint), "more work to do");

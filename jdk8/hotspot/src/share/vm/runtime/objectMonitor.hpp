@@ -34,7 +34,7 @@
 // ParkEvent instead.  Beware, however, that the JVMTI code
 // knows about ObjectWaiters, so we'll have to reconcile that code.
 // See next_waiter(), first_waiter(), etc.
-
+// 监视器-队列元素定义(_cxq,_WaitSet,_EntryList)
 class ObjectWaiter : public StackObj {
  public:
   enum TStates { TS_UNDEF, TS_READY, TS_RUN, TS_WAIT, TS_ENTER, TS_CXQ } ;
@@ -73,7 +73,7 @@ class EventJavaMonitorWait;
 
 // It is also used as RawMonitor by the JVMTI
 
-
+// 监视器对象
 class ObjectMonitor {
  public:
   enum {

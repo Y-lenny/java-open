@@ -1225,11 +1225,32 @@ UNSAFE_ENTRY(jboolean, Unsafe_CompareAndSwapObject(JNIEnv *env, jobject unsafe, 
   return success;
 UNSAFE_END
 
+/*
+ * 这个看起来好像不像一个函数，不过不用担心，不是重点。UNSAFE_ENTRY 和 UNSAFE_END 都是宏，
+ * 在预编译期间会被替换成真正的代码。下面的 jboolean、jlong 和 jint 等是一些类型定义（typedef）：
+ *
+ * jni.h
+ *     typedef unsigned char   jboolean;
+ *     typedef unsigned short  jchar;
+ *     typedef short           jshort;
+ *     typedef float           jfloat;
+ *     typedef double          jdouble;
+ *
+ * jni_md.h
+ *     typedef int jint;
+ *     #ifdef _LP64 // 64-bit
+ *     typedef long jlong;
+ *     #else
+ *     typedef long long jlong;
+ *     #endif
+ *     typedef signed char jbyte;
+ */
 UNSAFE_ENTRY(jboolean, Unsafe_CompareAndSwapInt(JNIEnv *env, jobject unsafe, jobject obj, jlong offset, jint e, jint x))
   UnsafeWrapper("Unsafe_CompareAndSwapInt");
   oop p = JNIHandles::resolve(obj);
+  // 根据偏移量，计算 value 的地址。这里的 offset 就是 AtomaicInteger 中的 valueOffset
   jint* addr = (jint *) index_oop_from_field_offset_long(p, offset);
-  return (jint)(Atomic::cmpxchg(x, addr, e)) == e;
+  return (jint)(Atomic::cmpxchg(x, addr, e)) == e;// 调用atommic.cpp-cmpxchg方法进行cas操作-45L
 UNSAFE_END
 
 UNSAFE_ENTRY(jboolean, Unsafe_CompareAndSwapLong(JNIEnv *env, jobject unsafe, jobject obj, jlong offset, jlong e, jlong x))

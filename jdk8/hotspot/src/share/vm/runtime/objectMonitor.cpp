@@ -313,7 +313,7 @@ bool ObjectMonitor::try_enter(Thread* THREAD) {
     return true;
   }
 }
-// 获取锁流程
+// 重量锁入口
 void ATTR ObjectMonitor::enter(TRAPS) {
   // The following code is ordered to check the most common cases first
   // and to reduce RTS->RTO cache line upgrades on SPARC and IA32 processors.
@@ -504,7 +504,7 @@ void ATTR ObjectMonitor::EnterI (TRAPS) {
     assert (((JavaThread *) Self)->thread_state() == _thread_blocked   , "invariant") ;
 
     // Try the lock - TATAS
-    if (TryLock (Self) > 0) {
+    if (TryLock (Self) > 0) { //这下不自旋了，我就默默的TryLock一下
         assert (_succ != Self              , "invariant") ;
         assert (_owner == Self             , "invariant") ;
         assert (_Responsible != Self       , "invariant") ;
@@ -520,7 +520,7 @@ void ATTR ObjectMonitor::EnterI (TRAPS) {
     // to the owner.  This has subtle but beneficial affinity
     // effects.
 
-    if (TrySpin (Self) > 0) {
+    if (TrySpin (Self) > 0) {//此处又有自旋获取锁的操作
         assert (_owner == Self        , "invariant") ;
         assert (_succ != Self         , "invariant") ;
         assert (_Responsible != Self  , "invariant") ;
@@ -553,13 +553,13 @@ void ATTR ObjectMonitor::EnterI (TRAPS) {
     // enqueue and dequeue on EntryList|cxq.
     // 通过cas把node节点放入到_cxq队列中
     ObjectWaiter * nxt ;
-    for (;;) {
-        node._next = nxt = _cxq ;
+    for (;;) {//循环，保证将node插入队列
+        node._next = nxt = _cxq ;//将node插入到_cxq队列的首部
         if (Atomic::cmpxchg_ptr (&node, &_cxq, nxt) == nxt) break ;
 
         // Interference - the CAS failed because _cxq changed.  Just retry.
         // As an optional optimization we retry the lock.
-        if (TryLock (Self) > 0) {
+        if (TryLock (Self) > 0) {//我再默默的TryLock一下，真的是不想挂起呀！
             assert (_succ != Self         , "invariant") ;
             assert (_owner == Self        , "invariant") ;
             assert (_Responsible != Self  , "invariant") ;
@@ -612,7 +612,7 @@ void ATTR ObjectMonitor::EnterI (TRAPS) {
     int RecheckInterval = 1 ;
 
     for (;;) {
-        // 线程在挂起前做下重新获取锁
+        // //临死之前，我再TryLock下
         if (TryLock (Self) > 0) break ;
         assert (_owner != Self, "invariant") ;
 
@@ -1185,7 +1185,7 @@ void ATTR ObjectMonitor::exit(bool not_suspended, TRAPS) {
       }
 
       w = _EntryList  ;
-      if (w != NULL) {
+      if (w != NULL) {//从_EntryList中唤醒线程
           // I'd like to write: guarantee (w->_thread != Self).
           // But in practice an exiting thread may find itself on the EntryList.
           // Lets say thread T1 calls O.wait().  Wait() enqueues T1 on O's waitset and
@@ -1205,12 +1205,12 @@ void ATTR ObjectMonitor::exit(bool not_suspended, TRAPS) {
       // If we find that both _cxq and EntryList are null then just
       // re-run the exit protocol from the top.
       w = _cxq ;
-      if (w == NULL) continue ;
+      if (w == NULL) continue ;//如果_cxq和_EntryList队列都为空，自旋
 
       // Drain _cxq into EntryList - bulk transfer.
       // First, detach _cxq.
       // The following loop is tantamount to: w = swap (&cxq, NULL)
-      for (;;) {
+      for (;;) {//自旋再获得cxq首结点
           assert (w != NULL, "Invariant") ;
           ObjectWaiter * u = (ObjectWaiter *) Atomic::cmpxchg_ptr (NULL, &_cxq, w) ;
           if (u == w) break ;
@@ -1346,7 +1346,7 @@ void ObjectMonitor::ExitEpilog (Thread * Self, ObjectWaiter * Wakee) {
    OrderAccess::fence() ;                               // ST _owner vs LD in unpark()
 
    if (SafepointSynchronize::do_call_back()) {
-      TEVENT (unpark before SAFEPOINT) ;
+      TEVENT (unpark before SAFEPOINT) ;cmpxchg_ptr
    }
 
    DTRACE_MONITOR_PROBE(contended__exit, this, object(), Self);

@@ -60,6 +60,7 @@ inline void Atomic::store_ptr(intptr_t store_value, volatile intptr_t* dest) { *
 inline void Atomic::store_ptr(void*    store_value, volatile void*     dest) { *(void* volatile *)dest = store_value; }
 
 // Adding a lock prefix to an instruction on MP machine
+// 添加一个lock前缀至一个汇编机器码
 // VC++ doesn't like the lock prefix to be on a single line
 // so we can't insert a label after the lock prefix.
 // By emitting a lock prefix, we can define a label after it.
@@ -215,11 +216,38 @@ inline void*    Atomic::xchg_ptr(void*    exchange_value, volatile void*     des
 
 inline jint     Atomic::cmpxchg    (jint     exchange_value, volatile jint*     dest, jint     compare_value) {
   // alternative for InterlockedCompareExchange
-  int mp = os::is_MP();
+  int mp = os::is_MP(); // 判断是否是多核 CPU
   __asm {
     mov edx, dest
     mov ecx, exchange_value
     mov eax, compare_value
+    //  cmp mp, 0
+        /*
+         * 如果 mp = 0，表明是线程运行在单核 CPU 环境下。此时 je 会跳转到 L0 标记处，
+         * 也就是越过 _emit 0xF0 指令，直接执行 cmpxchg 指令。也就是不在下面的 cmpxchg 指令
+         * 前加 lock 前缀。
+         */
+    //  je L0
+        /*
+         * 0xF0 是 lock 前缀的机器码，这里没有使用 lock，而是直接使用了机器码的形式。至于这样做的
+         * 原因可以参考知乎的一个回答：
+         *     https://www.zhihu.com/question/50878124/answer/123099923
+         */
+    //  _emit 0xF0
+    // L0:
+        /*
+         * 比较并交换。简单解释一下下面这条指令，熟悉汇编的朋友可以略过下面的解释:
+         *   cmpxchg: 即“比较并交换”指令
+         *   dword: 全称是 double word，在 x86/x64 体系中，一个
+         *          word = 2 byte，dword = 4 byte = 32 bit
+         *   ptr: 全称是 pointer，与前面的 dword 连起来使用，表明访问的内存单元是一个双字单元
+         *   [edx]: [...] 表示一个内存单元，edx 是寄存器，dest 指针值存放在 edx 中。
+         *          那么 [edx] 表示内存地址为 dest 的内存单元
+         *
+         * 这一条指令的意思就是，将 eax 寄存器中的值（compare_value）与 [edx] 双字内存单元中的值
+         * 进行对比，如果相同，则将 ecx 寄存器中的值（exchange_value）存入 [edx] 内存单元中。
+         */
+    // 以上注释编译后的代码，这行代码的目的就是根据是否是多核来添加lock前缀
     LOCK_IF_MP(mp)
     cmpxchg dword ptr [edx], ecx
   }
