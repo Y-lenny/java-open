@@ -51,7 +51,7 @@ import sun.net.www.ParseUtil;
 
 /**
  * This class is used by the system to launch the main application. Launcher
- * 这个类被用于系统启动主程序使。启动器
+ * 这个类被用于系统启动主应用程序。启动器
  */
 public class Launcher {
     private static URLStreamHandlerFactory factory = new Factory();
@@ -67,7 +67,7 @@ public class Launcher {
 
     public Launcher() {
         // Create the extension class loader
-        // 创建 扩展类加载器
+        // 创建 扩展类加载器，目的为了加载%JRE_HOME%/lib/ext 目录下的jar包和类，或被 java.ext.dirs 系统变量所指定的路径下的jar包
         ClassLoader extcl;
         try {
             extcl = ExtClassLoader.getExtClassLoader();
@@ -86,7 +86,7 @@ public class Launcher {
         }
 
         // Also set the context class loader for the primordial thread.
-        // 给原始线程设置上下文线程。
+        // 给原始线程（主线程/启动线程）设置上下文类加载器
         Thread.currentThread().setContextClassLoader(loader);
 
         // Finally, install a security manager if requested
@@ -122,6 +122,7 @@ public class Launcher {
 
     /*
      * The class loader used for loading installed extensions.
+     * 扩展类加载器：加载%JRE_HOME%/lib/ext 目录下的jar包和类，或被 java.ext.dirs 系统变量所指定的路径下的jar包
      */
     static class ExtClassLoader extends URLClassLoader {
 
@@ -132,7 +133,7 @@ public class Launcher {
         /**
          * create an ExtClassLoader. The ExtClassLoader is created
          * within a context that limits which files it can read
-         * 创建一个扩展类加载器。基于可访问文件目录构成的上下文中创建的。
+         * 创建一个扩展类加载器。在可访问文件目录构成的上下文中创建的。
          */
         public static ExtClassLoader getExtClassLoader() throws IOException
         {
@@ -263,7 +264,7 @@ public class Launcher {
     /**
      * The class loader used for loading from java.class.path.
      * runs in a restricted security context.
-     *
+     * 应用程序加载器：面向我们用户的加载器，负责加载当前应用classpath下的所有jar包和类。
      */
     static class AppClassLoader extends URLClassLoader {
 
