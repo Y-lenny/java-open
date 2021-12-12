@@ -398,7 +398,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      */
     private final AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
     //高3位表示线程状态，低29位表示活动线程数
-    private static final int COUNT_BITS = Integer.SIZE - 3;
+    private static final int COUNT_BITS = Integer.SIZE - 3; // 29位
     private static final int CAPACITY   = (1 << COUNT_BITS) - 1; //最大活动线程数: 00011111 11111111 11111111 11111111 = 2^(29) -1
 
     // runState is stored in the high-order bits
