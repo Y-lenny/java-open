@@ -185,32 +185,36 @@ import java.util.NoSuchElementException;
 public final class ServiceLoader<S>
     implements Iterable<S>
 {
-
+    // JDK默认的扫描目录
     private static final String PREFIX = "META-INF/services/";
 
     // The class or interface representing the service being loaded
+    // 即将需要被加载的类或接口
     private final Class<S> service;
 
     // The class loader used to locate, load, and instantiate providers
+    // 这个类加载器负责去定位，加载，实例化服务类
     private final ClassLoader loader;
 
     // The access control context taken when the ServiceLoader is created
     private final AccessControlContext acc;
 
     // Cached providers, in instantiation order
+    // 缓存服务类，以实例化顺序进行存储【遍历并加载实例化全部某个类/接口的服务实现】
     private LinkedHashMap<String,S> providers = new LinkedHashMap<>();
 
     // The current lazy-lookup iterator
+    // 当前懒加载迭代器
     private LazyIterator lookupIterator;
 
     /**
      * Clear this loader's provider cache so that all providers will be
      * reloaded.
-     *
+     * 清理这个服务加载器的缓存然后进行重新加载
      * <p> After invoking this method, subsequent invocations of the {@link
      * #iterator() iterator} method will lazily look up and instantiate
      * providers from scratch, just as is done by a newly-created loader.
-     *
+     * 在调用这个方法之后呢通过{@link #iterator() 迭代器}进行查找和实例化服务提供者。
      * <p> This method is intended for use in situations in which new providers
      * can be installed into a running Java virtual machine.
      */
@@ -319,14 +323,14 @@ public final class ServiceLoader<S>
     }
 
     // Private inner class implementing fully-lazy provider lookup
-    //
+    // 实现完全懒惰提供者查找的私有内部类
     private class LazyIterator
         implements Iterator<S>
     {
 
-        Class<S> service;
-        ClassLoader loader;
-        Enumeration<URL> configs = null;
+        Class<S> service; // 提供的服务接口或类
+        ClassLoader loader;// 类加载器
+        Enumeration<URL> configs = null;// 提供的服务实现资源列表
         Iterator<String> pending = null;
         String nextName = null;
 
@@ -334,7 +338,7 @@ public final class ServiceLoader<S>
             this.service = service;
             this.loader = loader;
         }
-
+        // 判断是否还有下一个服务实现类
         private boolean hasNextService() {
             if (nextName != null) {
                 return true;
@@ -343,30 +347,30 @@ public final class ServiceLoader<S>
                 try {
                     String fullName = PREFIX + service.getName();
                     if (loader == null)
-                        configs = ClassLoader.getSystemResources(fullName);
+                        configs = ClassLoader.getSystemResources(fullName);// 同下
                     else
-                        configs = loader.getResources(fullName);
+                        configs = loader.getResources(fullName);// 通过文件名查询系统资源列表
                 } catch (IOException x) {
                     fail(service, "Error locating configuration files", x);
                 }
             }
             while ((pending == null) || !pending.hasNext()) {
                 if (!configs.hasMoreElements()) {
-                    return false;
+                    return false;// 资源列表遍历完了且文件内容也遍历完了
                 }
-                pending = parse(service, configs.nextElement());
+                pending = parse(service, configs.nextElement());// 遍历下一个资源文件
             }
-            nextName = pending.next();
+            nextName = pending.next();//下一个服务实现类
             return true;
         }
-
+        // 获取下一个服务实现类并实例化它
         private S nextService() {
             if (!hasNextService())
                 throw new NoSuchElementException();
             String cn = nextName;
             nextName = null;
             Class<?> c = null;
-            try {
+            try {// 类查找并加载
                 c = Class.forName(cn, false, loader);
             } catch (ClassNotFoundException x) {
                 fail(service,
@@ -376,7 +380,7 @@ public final class ServiceLoader<S>
                 fail(service,
                      "Provider " + cn  + " not a subtype");
             }
-            try {
+            try {// 实例化并强转化放入到服务提供者列表中
                 S p = service.cast(c.newInstance());
                 providers.put(cn, p);
                 return p;
@@ -387,7 +391,7 @@ public final class ServiceLoader<S>
             }
             throw new Error();          // This cannot happen
         }
-
+        // 是否还有
         public boolean hasNext() {
             if (acc == null) {
                 return hasNextService();
@@ -398,7 +402,7 @@ public final class ServiceLoader<S>
                 return AccessController.doPrivileged(action, acc);
             }
         }
-
+        // 下一条
         public S next() {
             if (acc == null) {
                 return nextService();
